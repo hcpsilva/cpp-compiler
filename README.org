@@ -1,0 +1,90 @@
+#+title: cpp-compiler
+#+subtitle: A compiler made for the INF01147 course.
+#+author: Henrique Silva
+#+author: Luma Beserra
+
+Hi! In this repository we'll develop the final assignment for the INF01147
+course: a =bison= and =flex= based compiler for a C-like language.
+
+* Table of Contents                                                     :TOC:
+- [[Planned Stages of Development][Planned Stages of Development]]
+- [[Project Structure][Project Structure]]
+- [[Dependencies][Dependencies]]
+- [[Build][Build]]
+- [[Tests][Tests]]
+- [[Contact][Contact]]
+
+* Planned Stages of Development
+
+The project will span the following steps:
+
+| Stage | Description          |
+|-------+----------------------|
+| E1    | Lexical Analisys     |
+| E2    | Syntax Analisys      |
+| E3    | Abstract Syntax Tree |
+| E4    | Semantic Analisys    |
+| E5    | Code Generation      |
+| E6    | Execution Support    |
+| E7    | Optimization         |
+
+* Project Structure
+
+The project is structured in the following fashion:
+
+#+begin_src shell :exports results :results output
+tree --charset=ascii -d
+#+end_src
+
+#+RESULTS:
+: .
+: |-- doc
+: |-- include
+: |-- script
+: `-- src
+:
+: 4 directories
+
+* Dependencies
+
+As previously noted, there are several dependencies in order to build this
+project:
+
+- =meson=
+- =bison=
+- =flex=
+
+If not found, the project will pull the dependencies using the =spack= tool,
+pulled using git from its repository.
+
+* Build
+
+There is a helper =Makefile= in order to facilitate the build, but it is
+recommended you instead use =meson= in order to build the executables.
+
+Start by setting up the build
+
+#+begin_src shell
+meson setup build
+#+end_src
+
+where =build= is the chosen build directory (=meson= only does out-of-source builds,
+much like =cmake=). Then, you can build the project using the following command:
+
+#+begin_src shell
+meson compile -C build
+#+end_src
+
+* Tests
+
+There aren't any, but eventually there will be!
+
+* Contact
+
+You can contact us through our e-mails:
+
+#+begin_quote
+[[mailto:hcpsilva@inf.ufrgs.br][hcpsilva@inf.ufrgs.br]] (Henrique's e-mail)
+(Luma's e-mail)
+#+end_quote
+
