@@ -11,18 +11,22 @@
  * 'LICENSE', which is part of this source code package.
  */
 
-#pragma once
+#if !defined(_CPP_COMPILER_HPP_)
+#define _CPP_COMPILER_HPP_
 
 /**
  * Unnecessary.
  */
-auto is_running(void) -> int;
+auto isRunning(void) -> int;
 
 /**
  * Does nothing.
  */
-auto init(void) -> int;
+auto initMe(void) -> void;
 
-// aliases
-constexpr auto isRunning = is_running;
-constexpr auto initMe = init;
+/**
+ * I prefer it with another name.
+ */
+auto getLineNumber(void) -> int;
+
+#endif // _CPP_COMPILER_HPP_

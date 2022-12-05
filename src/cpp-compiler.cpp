@@ -13,12 +13,24 @@
 
 #include "cpp-compiler.hpp"
 
-auto is_running(void) -> int
+#include <cstdio>
+
+extern FILE* yyin;
+
+int get_line_number(void);
+
+auto isRunning(void) -> int
 {
-    return 0;
+    return !feof(yyin);
 }
 
-auto init(void) -> int
+auto initMe(void) -> void
 {
-    return 0;
+    return;
 }
+
+auto getLineNumber(void) -> int
+{
+    return get_line_number();
+}
+
