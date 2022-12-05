@@ -36,7 +36,7 @@ make clean
 
 for src_file in $(find . -mindepth 2 -regex '.*\.[chl]\(pp\)?'); do
     link=$(basename "$src_file")
-    ln -s $(readlink -f "$src_file" "$link")
+    ln -sf $(readlink -f "$src_file" "$link")
 done
 
 tar --exclude="${version}.tgz" \
@@ -46,6 +46,11 @@ tar --exclude="${version}.tgz" \
     -czf "$version.tgz" .
 
 mv Makefile.bak Makefile
+
+for src_file in $(find . -mindepth 2 -regex '.*\.[chl]\(pp\)?'); do
+    link=$(basename "$src_file")
+    rm "$link"
+done
 
 popd
 
