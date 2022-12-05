@@ -31,6 +31,10 @@
 *.out
 *.app
 
+# Archives
+*.tar.gz
+*.tgz
+
 # flex & bison
 *.yy*
 *.tab*
