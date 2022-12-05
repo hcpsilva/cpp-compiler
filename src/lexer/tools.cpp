@@ -13,7 +13,9 @@
 
 #include "tools.hpp"
 
-unsigned int get_line_number(void)
+extern int yylineno;
+
+int get_line_number(void)
 {
-    return (unsigned int)yylineno;
+    return yylineno;
 }

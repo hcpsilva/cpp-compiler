@@ -16,15 +16,16 @@
  * itself uses or other public functions to other modules.
  */
 
-#pragma once
+#if !defined(_DEBUG_HPP_)
+#define _DEBUG_HPP_
 
 #include <stdio.h>
 
 #ifdef VERBOSE
-#define V_PRINTF(f_, ...) printf((f_), ##__VA_ARGS__)
+#define V_PRINTF(...) printf(##__VA_ARGS__)
 #define V_PERROR(f_) perror((f_))
 #else
-#define V_PRINTF(f_, ...) ((void)0)
+#define V_PRINTF(...) ((void)0)
 #define V_PERROR(f_) ((void)0)
 #endif
 
@@ -36,3 +37,4 @@
 #define D_PRINTF(f_, ...) ((void)0)
 #endif
 
+#endif // _DEBUG_HPP_

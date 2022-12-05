@@ -16,15 +16,15 @@
  * itself uses or other public functions to other modules.
  */
 
-#pragma once
+#if !defined(_SCANNER_HPP_)
+#define _SCANNER_HPP_
 
 #include "tokens.h"
 
 #include <stdio.h>
 
-#include "tokens.h"
-#include "utils.h"
-#include "debug.h"
+#include "tools.hpp"
+#include "debug.hpp"
 
 extern int yylex(void);
 extern int yylex_destroy(void);
@@ -32,4 +32,4 @@ extern int yylex_destroy(void);
 extern FILE* yyin;
 extern char* yytext;
 
-extern int yylineno;
+#endif // _SCANNER_HPP_

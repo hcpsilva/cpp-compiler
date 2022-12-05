@@ -11,7 +11,8 @@
  * 'LICENSE', which is part of this source code package.
  */
 
-#pragma once
+#if !defined(_TOOLS_HPP_)
+#define _TOOLS_HPP_
 
 #include "lexer.hpp"
 
@@ -25,4 +26,4 @@
 #define PRINT_SPC_NAME(TOKEN) ((void)0)
 #endif
 
-extern int yylineno;
+#endif // _TOOLS_HPP_

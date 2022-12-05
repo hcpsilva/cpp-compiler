@@ -11,7 +11,14 @@
  * 'LICENSE', which is part of this source code package.
  */
 
-%option noyywrap yylineno
+%{
+#include "scanner.hpp"
+
+/* to track the initial column of matched tokens */
+int yycolumn = 1;
+%}
+
+%option noyywrap noinput nounput yylineno
 
 /* helpful character classes */
 WHITE [[:blank:],]
@@ -28,21 +35,6 @@ DELIM [[:punct:][:space:]]{-}[_\\~.]
 
 /* decimals */
 NUMBER [[:digit:]]
-
-%{
-#include "scanner.hpp"
-
-/* to track the initial column of matched tokens */
-int yycolumn = 1;
-/* to save the line of the current matches*/
-char* yylinebuf = NULL;
-size_t yylinebuf_len = 0;
-
-/* helpful flex feature that helps us to track the location of the tokens */
-#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno; \
-	yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
-	yycolumn += yyleng;
-%}
 
 /* states */
 %x COMMENT
@@ -74,15 +66,19 @@ OP_NE "!="
 	/* ----------  comments section ----------  */
 
 	/* block comment*/
-"///"                                  { BEGIN(COMMENT); V_LOG_LEXER("COMMENT STATE");}
+"///"                                  { BEGIN(COMMENT); V_LOG_LEXER("COMMENT STATE"); }
 	/* comment state */
-<COMMENT>                              {
+<COMMENT>{
 
-[^\\\n]*"\\\\\\"                       { BEGIN(INITIAL); V_LOG_LEXER("INITIAL STATE");}
+[^\\\n]*"\\\\\\"                       { BEGIN(INITIAL); V_LOG_LEXER("INITIAL STATE"); }
 [^\\\n]+
 "\\"{1,2}[^\\\n]*
 \n                                     { yycolumn = 1; }
-<<EOF>>                                { return TOKEN_ERROR; }
+<<EOF>>                                { 
+	BEGIN(INITIAL);
+	V_LOG_LEXER("BLOCK COMMENT EOF");
+	return TOKEN_ERROR;
+}
 
 }
 
@@ -94,7 +90,7 @@ OP_NE "!="
 {ALPHA}/{ALNUM}*                       { BEGIN(WORD); V_LOG_LEXER("WORD STATE"); yyless(0); }
 
 	/* word state */
-<WORD>                                 {
+<WORD>{
 
 	/* reserved keywords */
 {RK_INT}                               { V_LOG_LEXER("KW_INTE"); return KW_INTE; }
@@ -119,10 +115,10 @@ OP_NE "!="
 	/* ---------- special characters section ----------  */
 
 	/* composite operators */
-{OP_LE}                                { V_LOG_LEXER("OP_LE"); return OPERATOR_LE; }
-{OP_GE}                                { V_LOG_LEXER("OP_GE"); return OPERATOR_GE; }
-{OP_EQ}                                { V_LOG_LEXER("OP_EQ"); return OPERATOR_EQ; }
-{OP_NE}                                { V_LOG_LEXER("OP_NE"); return OPERATOR_DIF; }
+{OP_LE}                                { V_LOG_LEXER("OPERATOR_LE"); return OPERATOR_LE; }
+{OP_GE}                                { V_LOG_LEXER("OPERATOR_GE"); return OPERATOR_GE; }
+{OP_EQ}                                { V_LOG_LEXER("OPERATOR_EQ"); return OPERATOR_EQ; }
+{OP_NE}                                { V_LOG_LEXER("OPERATOR_DIF"); return OPERATOR_DIF; }
 
 	/* special characters */
 {SPECIAL}/{WHITE}?                     {
@@ -157,7 +153,7 @@ OP_NE "!="
 
 <QUOTE>{GRAPH}                         {
 	yyless(1);
-	BEGIN(INITAL);
+	BEGIN(INITIAL);
 	V_LOG_LEXER("MALFORMED QUOTE");
 	return TOKEN_ERROR;
 }
@@ -171,7 +167,7 @@ OP_NE "!="
 }
 
 	/* decimal state */
-<DECIMAL>                              {
+<DECIMAL>{
 
 	/* float */
 {NUMBER}+"."{NUMBER}+                  {
@@ -182,7 +178,6 @@ OP_NE "!="
 
 	/* malformed float */
 {NUMBER}+"."{ALNUM}+                   {
-	yyless(yyleng - 1);
 	BEGIN(INITIAL);
 	V_LOG_LEXER("MALFORMED FLOATING POINT");
 	return TOKEN_ERROR;
@@ -197,7 +192,6 @@ OP_NE "!="
 }
 	/* malformed decimal */
 {ALNUM}+                               {
-	yyless(yyleng - 1);
 	BEGIN(INITIAL);
 	V_LOG_LEXER("MALFORMED DECIMAL");
 	return TOKEN_ERROR;

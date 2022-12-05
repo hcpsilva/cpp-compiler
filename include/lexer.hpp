@@ -11,9 +11,9 @@
  * 'LICENSE', which is part of this source code package.
  */
 
-#pragma once
+#if !defined(_LEXER_HPP_)
+#define _LEXER_HPP_
 
 auto get_line_number(void) -> int;
 
-constexpr auto getLineNumber = get_line_number;
-
+#endif // _LEXER_HPP_
