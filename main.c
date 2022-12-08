@@ -21,7 +21,6 @@ int yylex();
 int yylex_destroy();
 
 extern char *yytext;
-extern FILE *yyin;
 
 #define UNUSED(x) (void)(x)
 

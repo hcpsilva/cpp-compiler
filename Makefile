@@ -61,8 +61,7 @@ CFLAGS :=\
 CFLAGS += $(if $(DEBUG),-g -fsanitize=address -DDEBUG)
 CFLAGS += $(if $(VERBOSE),-DVERBOSE)
 #	Feature flags for the lex program
-LFLAGS := --nomain
-LFLAGS += $(if $(DEBUG),-d)
+LFLAGS := $(if $(DEBUG),-d)
 #	Optimize if we aren't debugging
 OPT := $(if $(DEBUG),-O0,-O3 -march=native)
 #	Lookup directories

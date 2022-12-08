@@ -16,9 +16,12 @@
 
 /* to track the initial column of matched tokens */
 int yycolumn = 1;
+
+/* says when we're done. yeah. we realy don't need to do this. */
+bool is_done_scanning = false;
 %}
 
-%option noyywrap noinput nounput yylineno
+%option noinput nounput yylineno nomain
 
 /* helpful character classes */
 WHITE [[:blank:],]
@@ -207,3 +210,10 @@ OP_NE "!="
 <*>.                                   { V_LOG_LEXER("UNKNOWN"); return TOKEN_ERROR; }
 
 %%
+
+	/* this brings me physical pain */
+auto yywrap(void) -> int
+{
+	is_done_scanning = true;
+	return 1;
+}

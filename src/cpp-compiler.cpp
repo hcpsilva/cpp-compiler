@@ -13,15 +13,13 @@
 
 #include "cpp-compiler.hpp"
 
-#include <cstdio>
-
-extern FILE* yyin;
+extern bool is_done_scanning;
 
 int get_line_number(void);
 
 auto isRunning(void) -> int
 {
-    return !feof(yyin);
+    return !is_done_scanning;
 }
 
 auto initMe(void) -> void
