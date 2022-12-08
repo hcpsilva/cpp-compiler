@@ -29,12 +29,11 @@ GRAPH [[:graph:]]
 ALNUM [[:alnum:]_.]
 ALPHA [[:alpha:]_.]
 
-/* special punctuation characters */
-SPECIAL [[:punct:]]{-}[\'\"\`_~\\,.]
+/* special characters */
+SPECIAL [;()\[\]{}=+\-*/<>&|~]
 
-/* delimiters, which are either whitespace or special punctuation
- * characters */
-DELIM [[:punct:][:space:]]{-}[_\\~.]
+/* delimiters, which are either whitespace or special characters */
+DELIM [[:space:]]|{SPECIAL}
 
 /* decimals */
 NUMBER [[:digit:]]
@@ -77,11 +76,6 @@ OP_NE "!="
 [^\\\n]+
 "\\"{1,2}[^\\\n]*
 \n                                     { yycolumn = 1; }
-<<EOF>>                                { 
-	BEGIN(INITIAL);
-	V_LOG_LEXER("BLOCK COMMENT EOF");
-	return TOKEN_ERROR;
-}
 
 }
 
@@ -193,6 +187,7 @@ OP_NE "!="
 	return LIT_INTEIRO;
 
 }
+
 	/* malformed decimal */
 {ALNUM}+                               {
 	BEGIN(INITIAL);
