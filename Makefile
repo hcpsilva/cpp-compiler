@@ -45,7 +45,7 @@ DOC_DIR := doc
 
 #	- Compilation flags:
 #	Compiler and language version
-CC := clang++ -std=c++17
+CC := clang++ -std=c++11
 LEX := flex
 #	CFLAGS contains some basic sanity warning flags besides the eventual
 #	preprocessor definition or debug flag.

@@ -81,10 +81,9 @@ There aren't any, but eventually there will be!
 
 * Contact
 
-You can contact us through our e-mails:
+You can contact me through my e-mail:
 
 #+begin_quote
-[[mailto:hcpsilva@inf.ufrgs.br][hcpsilva@inf.ufrgs.br]] (Henrique's e-mail)
-(Luma's e-mail)
+[[mailto:hcpsilva@inf.ufrgs.br][hcpsilva@inf.ufrgs.br]]
 #+end_quote
 

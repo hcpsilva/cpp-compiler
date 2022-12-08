@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 #ifdef VERBOSE
-#define V_PRINTF(...) printf(##__VA_ARGS__)
+#define V_PRINTF(f_, ...) printf((f_), ##__VA_ARGS__)
 #define V_PERROR(f_) perror((f_))
 #else
 #define V_PRINTF(...) ((void)0)

@@ -36,7 +36,7 @@ make clean
 
 for src_file in $(find . -mindepth 2 -regex '.*\.[chl]\(pp\)?'); do
     link=$(basename "$src_file")
-    ln -sf $(readlink -f "$src_file" "$link")
+    ln -sf "$src_file" "$link"
 done
 
 tar --exclude="${version}.tgz" \

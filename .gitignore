@@ -40,13 +40,10 @@
 *.tab*
 
 # Extras
+!.gitkeep
 [Bb]uild/
 .vscode/
 .cache/
 compile_commands.json
 etapa[0-9]
-
-# Meson Wraps
-!subprojects/*.wrap
-subprojects/**/*
 
