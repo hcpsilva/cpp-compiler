@@ -34,7 +34,9 @@ sed -i.bak 's/RELEASE ?=/RELEASE := true/g' Makefile
 
 make clean
 
-for src_file in $(find . -mindepth 2 -regex '.*\.[chl]\(pp\)?'); do
+SOURCE_FILES=$(find . -mindepth 2 -regex '.*\.[chl]\(pp\)?')
+
+for src_file in $SOURCE_FILES; do
     link=$(basename "$src_file")
     ln -sf "$src_file" "$link"
 done
@@ -47,7 +49,7 @@ tar --exclude="${version}.tgz" \
 
 mv Makefile.bak Makefile
 
-for src_file in $(find . -mindepth 2 -regex '.*\.[chl]\(pp\)?'); do
+for src_file in $SOURCE_FILES; do
     link=$(basename "$src_file")
     rm "$link"
 done
