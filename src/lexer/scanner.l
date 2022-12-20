@@ -11,13 +11,13 @@
  * 'LICENSE', which is part of this source code package.
  */
 
-%option noyywrap yylineno
+%option noinput nounput yylineno nomain noyywrap
 
 /* helpful character classes */
-WHITE [[:blank:],]
+WHITE [[:blank:]]
 GRAPH [[:graph:]]
-ALNUM [[:alnum:]_.]
-ALPHA [[:alpha:]_.]
+ALNUM [[:alnum:]]
+ALPHA [[:alpha:]]
 
 /* special punctuation characters */
 SPECIAL [[:punct:]]{-}[\'\"\`_~\\,.]

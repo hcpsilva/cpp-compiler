@@ -1,40 +1,40 @@
 /*
- * Compiladores - etapa1 - tokens.h - semestre 2022/2 - M Johann
+ * Compiladores - etapa1 - tokens.h - semestre 2022/2
  *
  * Lista dos tokens, com valores constantes associados. Este arquivo será
  * posteriormente substituído, nao acrescente nada. Os valores das constantes
  * sao arbitrários, mas nao podem ser alterados. Cada valor deve ser distinto e
- * fora da escala ascii. Assim, nao conflitam entre si e com os tokens
+ * fora da escala ASCII. Assim, nao conflitam entre si e com os tokens
  * representados pelo próprio valor ascii de caracteres isolados.
  */
 
 #if !defined(_TOKENS_H_)
 #define _TOKENS_H_
 
-#define KW_CARA       256
-#define KW_INTE       257
-#define KW_REAL       258
-
-#define KW_SE         261
-#define KW_ENTAUM     262
-#define KW_SENAUM     263
-#define KW_ENQUANTO   264
-#define KW_ENTRADA    266
-#define KW_ESCREVA    267
-#define KW_RETORNE    268
-
-#define OPERATOR_LE   270
-#define OPERATOR_GE   271
-#define OPERATOR_EQ   272
-#define OPERATOR_DIF  273
-
-#define TK_IDENTIFIER 280
-
-#define LIT_INTEIRO   281
-#define LIT_FLOAT     282
-#define LIT_CHAR      285
-#define LIT_STRING    286
-
-#define TOKEN_ERROR   290
+#define TK_PR_INT          300
+#define TK_PR_FLOAT        301
+#define TK_PR_BOOL         302
+#define TK_PR_CHAR         303
+#define TK_PR_IF           304
+#define TK_PR_THEN         305
+#define TK_PR_ELSE         306
+#define TK_PR_WHILE        307
+#define TK_PR_INPUT        308
+#define TK_PR_OUTPUT       309
+#define TK_PR_RETURN       310
+#define TK_PR_FOR          311
+#define TK_OC_LE           312
+#define TK_OC_GE           313
+#define TK_OC_EQ           314
+#define TK_OC_NE           315
+#define TK_OC_AND          316
+#define TK_OC_OR           317
+#define TK_LIT_INT         318
+#define TK_LIT_FLOAT       319
+#define TK_LIT_FALSE       320
+#define TK_LIT_TRUE        321
+#define TK_LIT_CHAR        322
+#define TK_IDENTIFICADOR   323
+#define TK_ERRO            324
 
 #endif // _TOKENS_H_
