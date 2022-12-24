@@ -28,7 +28,7 @@ void print_token_normal(char* token);
 void print_token_especial(int token);
 int  print_token(int token);
 
-int main(int argc, char** argv)
+int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
     int token = 0, retorno = 0;
 
