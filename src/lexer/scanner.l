@@ -42,9 +42,6 @@ RK_RETURN "return"
 RK_FOR "for"
 /* special punctuation or operator characters */
 SPC_CHAR [,;:(){}+*/%^<>=!-]
-/* delimiters, which are either whitespace or special punctuation
- * characters */
-DELIM ({SPC_CHAR}|{WHITE}|\n)
 /* composite operators */
 OP_LE "<="
 OP_GE ">="
@@ -66,7 +63,7 @@ BOOL_F "false"
 
 %%
 
-	/* ----------  comments section ----------  */
+	/* ----------  comments section ---------- */
 	/* block comment*/
 "/*"                                   { BEGIN(COMMENT); V_LOG_LEXER("COMMENT STATE"); }
 	/* comment state */
@@ -83,7 +80,7 @@ BOOL_F "false"
 	/* line comments */
 "//".*
 
-	/* ----------  words section ----------  */
+	/* ----------  words section ---------- */
 
 {ALPHA}+                               {
 	BEGIN(WORD);
@@ -119,28 +116,29 @@ BOOL_F "false"
 }
 
 
-	/* ---------- special characters section ----------  */
+	/* ---------- special characters section ---------- */
 
 	/* composite operators */
-{OP_LE}                        { V_LOG_LEXER("OP_LE"); return TK_OC_LE; }
-{OP_GE}                        { V_LOG_LEXER("OP_GE"); return TK_OC_GE; }
-{OP_EQ}                        { V_LOG_LEXER("OP_EQ"); return TK_OC_EQ; }
-{OP_NE}                        { V_LOG_LEXER("OP_NE"); return TK_OC_NE; }
-{OP_AND}                       { V_LOG_LEXER("OP_AND"); return TK_OC_AND; }
-{OP_OR}                        { V_LOG_LEXER("OP_OR"); return TK_OC_OR; }
+{OP_LE}                                { V_LOG_LEXER("OP_LE"); return TK_OC_LE; }
+{OP_GE}                                { V_LOG_LEXER("OP_GE"); return TK_OC_GE; }
+{OP_EQ}                                { V_LOG_LEXER("OP_EQ"); return TK_OC_EQ; }
+{OP_NE}                                { V_LOG_LEXER("OP_NE"); return TK_OC_NE; }
+{OP_AND}                               { V_LOG_LEXER("OP_AND"); return TK_OC_AND; }
+{OP_OR}                                { V_LOG_LEXER("OP_OR"); return TK_OC_OR; }
 
 	/* special characters */
-{SPC_CHAR}/{WHITE}?            {
+{SPC_CHAR}                             {
 	V_LOG_LEXER("SPECIAL");
 	return (int)*yytext;
 }
 
 
-	/* ---------- literals section ----------  */
+	/* ---------- literals section ---------- */
 
 	/* character literals */
-"\'"                           { BEGIN(QUOTE); yymore(); V_LOG_LEXER("CHAR STATE"); }
-<QUOTE>("\\".|[^\'\n\\]?)"\'"          {
+"\'"                                   { BEGIN(QUOTE); yymore(); V_LOG_LEXER("CHAR STATE"); }
+
+<QUOTE>("\\"{ESC_SEQ}|[^\'\n\\]?)"\'"  {
 	BEGIN(INITIAL);
 	V_LOG_LEXER("QUOTED CHARACTER");
 	return TK_LIT_CHAR;
@@ -192,9 +190,9 @@ BOOL_F "false"
 }
 
 }
-	/* ---------- misc section ----------  */
+	/* ---------- misc section ---------- */
 	/* whitespace or newlines between tokens */
-({WHITE}|\n)+ { }
+({WHITE}|\n)+
 
 	/* error catch-all */
 <*>.                                   { V_LOG_LEXER("UNKNOWN"); BEGIN(INITIAL); return TK_ERRO; }
