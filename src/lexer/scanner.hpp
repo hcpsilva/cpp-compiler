@@ -20,16 +20,6 @@
 
 #include "tokens.h"
 
-#include <stdio.h>
+#include "tools.hpp"
+#include "debug.hpp"
 
-#include "tokens.h"
-#include "utils.h"
-#include "debug.h"
-
-extern int yylex(void);
-extern int yylex_destroy(void);
-
-extern FILE* yyin;
-extern char* yytext;
-
-extern int yylineno;

@@ -13,7 +13,7 @@
 
 #include "tools.hpp"
 
-unsigned int get_line_number(void)
+auto get_line_number(void) -> int
 {
-    return (unsigned int)yylineno;
+    return yylineno;
 }

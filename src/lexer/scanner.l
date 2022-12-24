@@ -11,23 +11,7 @@
  * 'LICENSE', which is part of this source code package.
  */
 
-%option noinput nounput yylineno nomain noyywrap
-
-/* helpful character classes */
-WHITE [[:blank:]]
-GRAPH [[:graph:]]
-ALNUM [[:alnum:]]
-ALPHA [[:alpha:]]
-
-/* special punctuation characters */
-SPECIAL [[:punct:]]{-}[\'\"\`_~\\,.]
-
-/* delimiters, which are either whitespace or special punctuation
- * characters */
-DELIM [[:punct:][:space:]]{-}[_\\~.]
-
-/* decimals */
-NUMBER [[:digit:]]
+%option nounput yylineno nomain noyywrap
 
 %{
 #include "scanner.hpp"
@@ -36,180 +20,188 @@ NUMBER [[:digit:]]
 int yycolumn = 1;
 /* to save the line of the current matches*/
 char* yylinebuf = NULL;
-size_t yylinebuf_len = 0;
-
-/* helpful flex feature that helps us to track the location of the tokens */
-#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno; \
-	yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
-	yycolumn += yyleng;
+int yylinebuf_len = 0;
 %}
 
-/* states */
-%x COMMENT
-%x WORD
-%x STRING
-%x QUOTE
-%x DECIMAL
+/* helpful character classes */
+WHITE [[:blank:]]
+GRAPH [[:graph:]]
+ALNUM [[:alnum:]]
+ALPHA [[:alpha:]]
 
+/* to handle escape sequences require the modification of the matched
+ * string, which is not a good idea to do with yytext, as it points
+ * directly to the input stream */
+ESC_SEQ [abfnrtv\\\"\']
 /* reserved keywords */
-RK_INT "inte"
-RK_FLOAT "real"
-RK_CHAR "chara"
-RK_IF "se"
-RK_THEN "entaum"
-RK_ELSE "senaum"
-RK_WHILE "enquanto"
-RK_INPUT "entrada"
-RK_OUTPUT "escreva"
-RK_RETURN "retorne"
-
+RK_INT "int"
+RK_FLOAT "float"
+RK_BOOL "bool"
+RK_CHAR "char"
+RK_IF "if"
+RK_THEN "then"
+RK_ELSE "else"
+RK_WHILE "while"
+RK_INPUT "input"
+RK_OUTPUT "output"
+RK_RETURN "return"
+RK_FOR "for"
+/* special punctuation or operator characters */
+SPC_CHAR [,;:(){}+*/%^<>=!-]
+/* delimiters, which are either whitespace or special punctuation
+ * characters */
+DELIM ({SPC_CHAR}|{WHITE}|\n)
 /* composite operators */
 OP_LE "<="
 OP_GE ">="
 OP_EQ "=="
 OP_NE "!="
+OP_AND "&&"
+OP_OR "||"
+/* decimals */
+NUMBER [[:digit:]]
+SCI_NOT [eE][+\-]?{NUMBER}+
+/* boolean literals */
+BOOL_T "true"
+BOOL_F "false"
+/* states */
+%x COMMENT
+%x WORD
+%x QUOTE
+%x DECIMAL
 
 %%
 
 	/* ----------  comments section ----------  */
-
 	/* block comment*/
-"///"                                  { BEGIN(COMMENT); V_LOG_LEXER("COMMENT STATE");}
+"/*"                                   { BEGIN(COMMENT); V_LOG_LEXER("COMMENT STATE"); }
 	/* comment state */
-<COMMENT>                              {
+<COMMENT>{
 
-[^\\\n]*"\\\\\\"                       { BEGIN(INITIAL); V_LOG_LEXER("INITIAL STATE");}
-[^\\\n]+
-"\\"{1,2}[^\\\n]*
+"*"+"/"                                { BEGIN(INITIAL); V_LOG_LEXER("INITIAL STATE"); }
+[^*\n]*
+"*"+[^*/\n]*
 \n                                     { yycolumn = 1; }
-<<EOF>>                                { return TOKEN_ERROR; }
+<<EOF>>                                { return TK_ERRO; }
 
 }
 
 	/* line comments */
 "//".*                                 { yycolumn = 1; }
 
-	/* ---------- word section ---------- */
+	/* ----------  words section ----------  */
 
-{ALPHA}/{ALNUM}*                       { BEGIN(WORD); V_LOG_LEXER("WORD STATE"); yyless(0); }
+{ALPHA}+                               {
+	BEGIN(WORD);
+	V_LOG_LEXER("WORD STATE");
+	yycolumn -= yyleng;
+	yyless(0);
+}
+
 
 	/* word state */
-<WORD>                                 {
+<WORD>{
 
 	/* reserved keywords */
-{RK_INT}                               { V_LOG_LEXER("KW_INTE"); return KW_INTE; }
-{RK_FLOAT}                             { V_LOG_LEXER("KW_REAL"); return KW_REAL; }
-{RK_CHAR}                              { V_LOG_LEXER("KW_CARA"); return KW_CARA; }
-{RK_IF}                                { V_LOG_LEXER("KW_SE"); return KW_SE; }
-{RK_THEN}                              { V_LOG_LEXER("KW_ENTAUM"); return KW_ENTAUM; }
-{RK_ELSE}                              { V_LOG_LEXER("KW_SENAUM"); return KW_SENAUM; }
-{RK_WHILE}                             { V_LOG_LEXER("KW_ENQUANTO"); return KW_ENQUANTO; }
-{RK_INPUT}                             { V_LOG_LEXER("KW_ENTRADA"); return KW_ENTRADA; }
-{RK_OUTPUT}                            { V_LOG_LEXER("KW_ESCREVA"); return KW_ESCREVA; }
-{RK_RETURN}                            { V_LOG_LEXER("KW_RETORNE"); return KW_RETORNE; }
+{RK_INT}                               { V_LOG_LEXER("RK_INT"); BEGIN(INITIAL); return TK_PR_INT; }
+{RK_FLOAT}                             { V_LOG_LEXER("RK_FLOAT"); BEGIN(INITIAL); return TK_PR_FLOAT; }
+{RK_BOOL}                              { V_LOG_LEXER("RK_BOOL"); BEGIN(INITIAL); return TK_PR_BOOL; }
+{RK_CHAR}                              { V_LOG_LEXER("RK_CHAR"); BEGIN(INITIAL); return TK_PR_CHAR; }
+{RK_IF}                                { V_LOG_LEXER("RK_IF"); BEGIN(INITIAL); return TK_PR_IF; }
+{RK_THEN}                              { V_LOG_LEXER("RK_THEN"); BEGIN(INITIAL); return TK_PR_THEN; }
+{RK_ELSE}                              { V_LOG_LEXER("RK_ELSE"); BEGIN(INITIAL); return TK_PR_ELSE; }
+{RK_WHILE}                             { V_LOG_LEXER("RK_WHILE"); BEGIN(INITIAL); return TK_PR_WHILE; }
+{RK_INPUT}                             { V_LOG_LEXER("RK_INPUT"); BEGIN(INITIAL); return TK_PR_INPUT; }
+{RK_OUTPUT}                            { V_LOG_LEXER("RK_OUTPUT"); BEGIN(INITIAL); return TK_PR_OUTPUT; }
+{RK_RETURN}                            { V_LOG_LEXER("RK_RETURN"); BEGIN(INITIAL); return TK_PR_RETURN; }
+{RK_FOR}                               { V_LOG_LEXER("RK_FOR"); BEGIN(INITIAL); return TK_PR_FOR; }
+
+	/* boolean literals */
+{BOOL_T}                               { V_LOG_LEXER("TRUE"); BEGIN(INITIAL); return TK_LIT_TRUE; }
+{BOOL_F}                               { V_LOG_LEXER("FALSE"); BEGIN(INITIAL); return TK_LIT_FALSE; }
 
 	/* identifiers */
-{ALPHA}{ALNUM}*                        { V_LOG_LEXER("TK_IDENTIFIER"); return TK_IDENTIFIER; }
-
-	/* end word */
-{DELIM}                                { BEGIN(INITIAL); V_LOG_LEXER("INITIAL STATE"); yyless(0); }
+{ALPHA}+                               { V_LOG_LEXER("IDENTIFIER"); BEGIN(INITIAL); return TK_IDENTIFICADOR; }
 
 }
+
 
 	/* ---------- special characters section ----------  */
 
 	/* composite operators */
-{OP_LE}                                { V_LOG_LEXER("OP_LE"); return OPERATOR_LE; }
-{OP_GE}                                { V_LOG_LEXER("OP_GE"); return OPERATOR_GE; }
-{OP_EQ}                                { V_LOG_LEXER("OP_EQ"); return OPERATOR_EQ; }
-{OP_NE}                                { V_LOG_LEXER("OP_NE"); return OPERATOR_DIF; }
+{OP_LE}                        { V_LOG_LEXER("OP_LE"); return TK_OC_LE; }
+{OP_GE}                        { V_LOG_LEXER("OP_GE"); return TK_OC_GE; }
+{OP_EQ}                        { V_LOG_LEXER("OP_EQ"); return TK_OC_EQ; }
+{OP_NE}                        { V_LOG_LEXER("OP_NE"); return TK_OC_NE; }
+{OP_AND}                       { V_LOG_LEXER("OP_AND"); return TK_OC_AND; }
+{OP_OR}                        { V_LOG_LEXER("OP_OR"); return TK_OC_OR; }
 
 	/* special characters */
-{SPECIAL}/{WHITE}?                     {
+{SPC_CHAR}/{WHITE}?            {
 	V_LOG_LEXER("SPECIAL");
 	return (int)*yytext;
 }
 
+
 	/* ---------- literals section ----------  */
 
-	/* string literals */
-"\""                                   { BEGIN(STRING); yymore(); V_LOG_LEXER("STRING STATE"); }
-<STRING>("\\".|[^\"\n\\])*"\""         {
-	BEGIN(INITIAL);
-	V_LOG_LEXER("QUOTED STRING");
-	return LIT_STRING;
-}
-
-<STRING>{GRAPH}                        {
-	yyless(1);
-	BEGIN(INITIAL);
-	V_LOG_LEXER("MALFORMED STRING");
-	return TOKEN_ERROR;
-}
-
 	/* character literals */
-"\'"                                   { BEGIN(QUOTE); yymore(); V_LOG_LEXER("CHAR STATE"); }
-<QUOTE>("\\".|[^\'\n\\])"\'"           {
+"\'"                           { BEGIN(QUOTE); yymore(); V_LOG_LEXER("CHAR STATE"); }
+<QUOTE>("\\".|[^\'\n\\]?)"\'"          {
 	BEGIN(INITIAL);
 	V_LOG_LEXER("QUOTED CHARACTER");
-	return LIT_CHAR;
+	return TK_LIT_CHAR;
 }
 
 <QUOTE>{GRAPH}                         {
 	yyless(1);
-	BEGIN(INITAL);
+	BEGIN(INITIAL);
 	V_LOG_LEXER("MALFORMED QUOTE");
-	return TOKEN_ERROR;
+	return TK_ERRO;
 }
 
 	/* number literals */
-{NUMBER}/{ALNUM}*                      {
+{NUMBER}/{ALNUM}*         {
 	BEGIN(DECIMAL);
 	V_LOG_LEXER("DECIMAL STATE");
-	yycolumn--;
 	yyless(0);
 }
 
 	/* decimal state */
-<DECIMAL>                              {
-
+<DECIMAL>{
 	/* float */
-{NUMBER}+"."{NUMBER}+                  {
+{NUMBER}+"."{NUMBER}+{SCI_NOT}?        {
 	BEGIN(INITIAL);
 	V_LOG_LEXER("FLOATING POINT");
-	return LIT_FLOAT;
+	return TK_LIT_FLOAT;
 }
 
 	/* malformed float */
 {NUMBER}+"."{ALNUM}+                   {
-	yyless(yyleng - 1);
 	BEGIN(INITIAL);
 	V_LOG_LEXER("MALFORMED FLOATING POINT");
-	return TOKEN_ERROR;
+	return TK_ERRO;
 }
 
 	/* integer */
 {NUMBER}+                              {
 	BEGIN(INITIAL);
 	V_LOG_LEXER("INTEGER");
-	return LIT_INTEIRO;
-
+	return TK_LIT_INT;
 }
+
 	/* malformed decimal */
 {ALNUM}+                               {
-	yyless(yyleng - 1);
 	BEGIN(INITIAL);
 	V_LOG_LEXER("MALFORMED DECIMAL");
-	return TOKEN_ERROR;
+	return TK_ERRO;
 }
 
 }
-
-	/* ---------- misc section ---------- */
-
+	/* ---------- misc section ----------  */
 	/* whitespace or newlines between tokens */
-({WHITE}|\n)+
-	/* error catch-all */
-<*>.                                   { V_LOG_LEXER("UNKNOWN"); return TOKEN_ERROR; }
+({WHITE}|\n)+ { }
 
+	/* error catch-all */
+<*>.                                   { V_LOG_LEXER("UNKNOWN"); BEGIN(INITIAL); return TK_ERRO; }
 %%
