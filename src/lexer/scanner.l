@@ -15,12 +15,6 @@
 
 %{
 #include "scanner.hpp"
-
-/* to track the initial column of matched tokens */
-int yycolumn = 1;
-/* to save the line of the current matches*/
-char* yylinebuf = NULL;
-int yylinebuf_len = 0;
 %}
 
 /* helpful character classes */
@@ -81,20 +75,19 @@ BOOL_F "false"
 "*"+"/"                                { BEGIN(INITIAL); V_LOG_LEXER("INITIAL STATE"); }
 [^*\n]*
 "*"+[^*/\n]*
-\n                                     { yycolumn = 1; }
+\n
 <<EOF>>                                { return TK_ERRO; }
 
 }
 
 	/* line comments */
-"//".*                                 { yycolumn = 1; }
+"//".*
 
 	/* ----------  words section ----------  */
 
 {ALPHA}+                               {
 	BEGIN(WORD);
 	V_LOG_LEXER("WORD STATE");
-	yycolumn -= yyleng;
 	yyless(0);
 }
 
