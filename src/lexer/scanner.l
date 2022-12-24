@@ -54,7 +54,7 @@ OP_AND "&&"
 OP_OR "||"
 /* decimals */
 NUMBER [[:digit:]]
-SCI_NOT [eE][+\-]?{NUMBER}+
+SCI_NOT ([eE][+\-]?{NUMBER}+)
 /* boolean literals */
 BOOL_T "true"
 BOOL_F "false"
@@ -154,10 +154,11 @@ BOOL_F "false"
 }
 
 	/* number literals */
-{NUMBER}/{ALNUM}*         {
+[+-]?{NUMBER}                          {
 	BEGIN(DECIMAL);
 	V_LOG_LEXER("DECIMAL STATE");
-	yyless(0);
+	yyless(yyleng - 1);
+	yymore();
 }
 
 	/* decimal state */
