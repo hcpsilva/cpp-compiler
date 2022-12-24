@@ -1,0 +1,26 @@
+# option('example',
+#   type : 'boolean',
+#   value : false,
+#   description : 'Here is a sample option'
+# )
+
+# general build options
+
+option('verbose',
+  type : 'boolean',
+  value : false,
+  description : 'Enables extra prints.'
+)
+
+option('enable-tests',
+  type : 'boolean',
+  value : false,
+  description : 'Enables tests.'
+)
+
+option('enable-docs',
+  type : 'boolean',
+  value : false,
+  description : 'Enables build of Doxygen and Read The Docs docs.'
+)
+

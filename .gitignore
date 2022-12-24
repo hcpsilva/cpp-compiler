@@ -30,10 +30,18 @@
 *.exe
 *.out
 *.app
+etapa*
 
 # Extras
 [Bb]uild/
+packagecache/
 
 # Meson Wraps
 !subprojects/*.wrap
 subprojects/**/*
+
+# Configurations (LSP, etc)
+.clangd
+.vscode
+.cache
+compile_commands*.json

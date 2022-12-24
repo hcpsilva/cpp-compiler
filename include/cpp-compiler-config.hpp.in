@@ -1,0 +1,24 @@
+/** @file invcsem_config.h
+ *
+ * @brief Simple configuration compile flags.
+ *
+ * A small collection of compile flags, defined by the meson options
+ * passed in the project setup. To check their default values, see
+ * 'meson_options.txt'.
+ *
+ * @license This file is subject to the terms and conditions defined in
+ * the file 'LICENSE', which is part of this source code package.
+ *
+ * @author Henrique Silva <hcpsilva@inf.ufrgs.br>
+ */
+
+#pragma once
+
+/** @brief the current version of the library as a static string */
+#mesondefine VERSION_STR
+
+/** @brief enables more verbose output */
+#mesondefine VERBOSE
+
+/** @brief enables debug output */
+#mesondefine DEBUG

@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "cpp-compiler-config.hpp"
+
 #include <stdio.h>
 
 #ifdef VERBOSE

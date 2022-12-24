@@ -12,22 +12,23 @@
  */
 
 #include <stdio.h>
-#define _(s)                                                            \
-    #s // https://gcc.gnu.org/onlinedocs/gcc-12.2.0/cpp/Stringizing.html
+#define _(s) \
+#s // https://gcc.gnu.org/onlinedocs/gcc-12.2.0/cpp/Stringizing.html
 #include "tokens.h"
+
 extern int yylex(void);
 extern int yylex_destroy(void);
 
-extern FILE *yyin;
-extern char *yytext;
-extern int get_line_number(void);
+extern FILE* yyin;
+extern char* yytext;
+extern int   get_line_number(void);
 
 /* protótipos deste módulo - as implementações estão após a main */
-void print_token_normal(char *token);
+void print_token_normal(char* token);
 void print_token_especial(int token);
-int print_token(int token);
+int  print_token(int token);
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     int token = 0, retorno = 0;
 
@@ -40,7 +41,7 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void print_nome(char *token)
+void print_nome(const char* token)
 {
     printf("%d %s [%s]\n", get_line_number(), token, yytext);
 }
@@ -53,7 +54,8 @@ void print_nome2(int token)
 /* A função retorna 0 se o token é conhecido. Caso contrário:
    - retorna 1 se o token é de erro
    - retorna 2 se o token é desconhecido */
-int print_token(int token) {
+int print_token(int token)
+{
     switch (token) {
     case ',':
     case ';':

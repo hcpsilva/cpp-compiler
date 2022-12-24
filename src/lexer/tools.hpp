@@ -14,6 +14,7 @@
 #pragma once
 
 #include "lexer.hpp"
+#include "cpp-compiler-config.hpp"
 
 #ifndef VERBOSE
 #define V_LOG_LEXER(STR) ((void)0)

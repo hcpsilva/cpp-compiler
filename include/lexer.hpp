@@ -14,6 +14,3 @@
 #pragma once
 
 auto get_line_number(void) -> int;
-
-constexpr auto getLineNumber = get_line_number;
-
