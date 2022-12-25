@@ -24,7 +24,7 @@ subdir('src') # sources
 
 cpp_compiler_lib = static_library('etapa1-lib', [],
   include_directories : include_dir,
-  dependencies : [fmt_dep],
+  dependencies : [fmt_dep, lexer_header_dep],
   link_whole : [project_libraries],
   install : true)
 
