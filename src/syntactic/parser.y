@@ -83,7 +83,8 @@ header
     | type TK_IDENTIFICADOR '(' ')'
     ;
 
-def_params_rep: def_params
+def_params_rep
+    : def_params
     | def_params_rep ',' def_params
     ;
 
@@ -125,12 +126,14 @@ var_local
     ;
 
     /* again, we can have multiple variables being declared at once */
-id_var_local_rep: id_var_local
+id_var_local_rep
+    : id_var_local
     | id_var_local_rep ',' id_var_local
     ;
 
     /* and they can be initialized (using "<=") */
-id_var_local: TK_IDENTIFICADOR
+id_var_local
+    : TK_IDENTIFICADOR
     | TK_IDENTIFICADOR TK_OC_LE TK_IDENTIFICADOR
     | TK_IDENTIFICADOR TK_OC_LE literal
     ;
