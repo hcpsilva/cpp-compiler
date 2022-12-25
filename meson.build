@@ -22,7 +22,7 @@ subdir('src') # sources
 
 cpp_compiler = executable('etapa1', main,
                           include_directories : include_dir,
-                          dependencies : [fmt_dep, liblexer_dep],
+                          dependencies : [fmt_dep, liblexic_dep],
                           install : true)
 
 # test('basic', exe)

@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "lexer.hpp"
+#include "lexic.hpp"
 #include "cpp-compiler-config.hpp"
 
 #ifndef VERBOSE

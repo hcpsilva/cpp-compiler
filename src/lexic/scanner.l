@@ -20,7 +20,6 @@
 /* helpful character classes */
 WHITE [[:blank:]]
 GRAPH [[:graph:]]
-ALNUM [[:alnum:]]
 ALPHA [[:alpha:]]
 
 /* to handle escape sequences require the modification of the matched
@@ -51,7 +50,7 @@ OP_AND "&&"
 OP_OR "||"
 /* decimals */
 NUMBER [[:digit:]]
-SCI_NOT ([eE][+\-]?{NUMBER}+)
+SCI_NOT ([eE][+-]?{NUMBER}+)
 /* boolean literals */
 BOOL_T "true"
 BOOL_F "false"
@@ -169,7 +168,7 @@ BOOL_F "false"
 }
 
 	/* malformed float */
-{NUMBER}+"."{ALNUM}+                   {
+{NUMBER}+"."/{GRAPH}+                  {
 	BEGIN(INITIAL);
 	V_LOG_LEXER("MALFORMED FLOATING POINT");
 	return TK_ERRO;
@@ -183,7 +182,7 @@ BOOL_F "false"
 }
 
 	/* malformed decimal */
-{ALNUM}+                               {
+{GRAPH}+                               {
 	BEGIN(INITIAL);
 	V_LOG_LEXER("MALFORMED DECIMAL");
 	return TK_ERRO;

@@ -1,2 +1,2 @@
 # traverse modules
-subdir('lexer')
+subdir('lexic')
