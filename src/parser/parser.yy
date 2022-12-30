@@ -129,8 +129,8 @@ id_global_var_rep
 	;
 
 id_global_var
-	: IDENTIFIER index
-	| IDENTIFIER
+	: IDENTIFIER
+	| IDENTIFIER index_def
 	;
 
 function
@@ -178,7 +178,7 @@ command
 	/* we use "<=" in attributions, for some reason */
 atrib
 	: IDENTIFIER OC_LESS_EQUAL expr
-	| IDENTIFIER index OC_LESS_EQUAL expr
+	/* | IDENTIFIER index OC_LESS_EQUAL expr */
 	;
 
 var_local
@@ -194,7 +194,6 @@ id_var_local_rep
 	/* and they can be initialized (using "<=") */
 id_var_local
 	: IDENTIFIER
-	| IDENTIFIER OC_LESS_EQUAL IDENTIFIER
 	| IDENTIFIER OC_LESS_EQUAL literal
 	;
 
@@ -271,11 +270,9 @@ op_un
 
 op_elem
 	: IDENTIFIER
-	| IDENTIFIER index
-	| INTEGER
-	| FLOATING_POINT
+	/* | IDENTIFIER index */ /* BUG: lots of conflicts! */
 	| call
-	| boolean
+	| literal
 	| LPAREN expr RPAREN
 	;
 
@@ -314,36 +311,33 @@ tk_op_un
 	/* ---------- LITERALS ----------  */
 
 literal
-	: decimal
-	| boolean
-	| CHARACTER
-	;
-
-decimal
-	: integer
-	| float
-	;
-
-integer
 	: INTEGER
-	;
-
-float
-	: FLOATING_POINT
-	;
-
-boolean
-	: TRUE
+	| FLOATING_POINT
+	| TRUE
 	| FALSE
+	| CHARACTER
 	;
 
 	/* ---------- MISC ----------  */
 
-index
-	: CARET
-	/*| CARET expr index*/
+index_def
+	: COLON index_def_rep
 	;
 
+index_def_rep
+	: INTEGER
+	| index_def_rep CARET INTEGER
+	;
+/* 
+index
+	: COLON index_rep
+	;
+
+index_rep
+	: expr
+	| index_rep CARET expr
+	;
+*/
 type
 	: INT
 	| FLOAT
