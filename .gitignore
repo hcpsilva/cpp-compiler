@@ -33,12 +33,11 @@
 etapa*
 
 # Extras
-[Bb]uild/
+[Bb]uild*/
 packagecache/
 
 # Meson Wraps
-!subprojects/*.wrap
-subprojects/**/*
+subprojects/*/
 
 # Configurations (LSP, etc)
 .clangd
