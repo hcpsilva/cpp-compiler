@@ -11,7 +11,7 @@
  * 'LICENSE', which is part of this source code package.
  */
 
-#include "tools.hpp"
+#include "scanner-tools.hh"
 
 auto get_line_number(void) -> int
 {

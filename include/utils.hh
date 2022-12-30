@@ -18,9 +18,18 @@
 
 #pragma once
 
-#include "cpp-compiler-config.hpp"
+#include <string>
 
-#include <stdio.h>
+namespace hcpsilva
+{
+
+template<typename... types>
+auto log(std::string const& format, types... arguments) -> void;
+
+template<typename... types>
+auto debug(std::string const& format, types... arguments) -> void;
+
+}
 
 #ifdef VERBOSE
 #define V_PRINTF(f_, ...) printf((f_), ##__VA_ARGS__)

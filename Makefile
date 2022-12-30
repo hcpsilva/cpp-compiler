@@ -16,8 +16,10 @@
 
 BUILD_DIR := build
 SCRIPT_DIR := script
+SRC_DIR := src
 
-BIN := etapa1
+BIN := etapa2
+MAIN := stage-2.cc
 
 .DEFAULT_GOAL = all
 
@@ -28,11 +30,12 @@ all: compile
 
 setup:
 	rm -rf $(BUILD_DIR)
-	-test -f main.c && mv main.c main.cpp
+	-test -f main.c && mv main.c $(SRC_DIR)/$(MAIN)
+	$(SCRIPT_DIR)/evil-code-injection.sh $(SRC_DIR)/$(MAIN)
 	meson setup $(BUILD_DIR)
 
 compile: setup
-	ninja -C $(BUILD_DIR)
-	@ln -fs $(shell readlink -f $(BUILD_DIR)/$(BIN)) $(BIN)
+	meson compile -C $(BUILD_DIR)
+	ln -fs $(shell readlink -f $(BUILD_DIR)/$(basename $(MAIN))) $(BIN)
 
 release: ; $(SCRIPT_DIR)/release.sh

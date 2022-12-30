@@ -8,7 +8,7 @@ conf_inc.set('DEBUG', get_option('buildtype') in ['debug', 'debugoptimized'])
 
 # create configuration file
 configure_file(
-  input : 'cpp-compiler-config.hpp.in',
+  input : 'build-configurations.hh.in',
   output : '@BASENAME@',
   configuration : conf_inc
 )

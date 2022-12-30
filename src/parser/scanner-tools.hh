@@ -13,8 +13,7 @@
 
 #pragma once
 
-#include "lexic.hpp"
-#include "cpp-compiler-config.hpp"
+#include "build-configurations.hh"
 
 #ifndef VERBOSE
 #define V_LOG_LEXER(STR) ((void)0)
@@ -27,3 +26,4 @@
 #endif
 
 extern int yylineno;
+extern char* yytext;
