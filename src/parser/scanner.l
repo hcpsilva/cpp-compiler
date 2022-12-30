@@ -47,7 +47,6 @@ RK_WHILE "while"
 RK_INPUT "input"
 RK_OUTPUT "output"
 RK_RETURN "return"
-RK_FOR "for"
 /* single character operations */
 OP_PLUS "+"
 OP_MINUS "-"
@@ -135,7 +134,6 @@ DELIM [[:punct:][:blank:]]
 {RK_INPUT}								 { return yy::parser::make_INPUT(loc); }
 {RK_OUTPUT}								 { return yy::parser::make_OUTPUT(loc); }
 {RK_RETURN}								 { return yy::parser::make_RETURN(loc); }
-{RK_FOR}								 { return yy::parser::make_FOR(loc); }
 
 	/* boolean literals */
 {LIT_TRUE}                               { return yy::parser::make_TRUE(true, loc); }

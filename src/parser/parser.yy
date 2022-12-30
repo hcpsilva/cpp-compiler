@@ -61,7 +61,6 @@
 	INPUT	"input"
 	OUTPUT	"output"
 	RETURN	"return"
-	FOR		"for"
 ;
 
 /* operators */
@@ -201,17 +200,12 @@ id_var_local
 
 control_flow
 	: if
-	| for
 	| while
 	;
 
 if
 	: IF LPAREN expr RPAREN THEN block
 	| IF LPAREN expr RPAREN THEN block ELSE block
-	;
-
-for
-	: FOR LPAREN atrib COLON expr COLON atrib RPAREN block
 	;
 
 while
