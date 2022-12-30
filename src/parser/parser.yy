@@ -175,10 +175,10 @@ command
 	| block
 	;
 
-	/* we use "<=" in attributions, for some reason */
+	/* we use "=" in attributions, as expected */
 atrib
-	: IDENTIFIER OC_LESS_EQUAL expr
-	/* | IDENTIFIER index OC_LESS_EQUAL expr */
+	: IDENTIFIER EQUAL expr
+	| IDENTIFIER index EQUAL expr
 	;
 
 var_local
@@ -191,7 +191,7 @@ id_var_local_rep
 	| id_var_local_rep COMMA id_var_local
 	;
 
-	/* and they can be initialized (using "<=") */
+	/* and they can be initialized (using "<=", for some reason) */
 id_var_local
 	: IDENTIFIER
 	| IDENTIFIER OC_LESS_EQUAL literal
@@ -328,7 +328,7 @@ index_def_rep
 	: INTEGER
 	| index_def_rep CARET INTEGER
 	;
-/* 
+
 index
 	: COLON index_rep
 	;
@@ -337,7 +337,7 @@ index_rep
 	: expr
 	| index_rep CARET expr
 	;
-*/
+
 type
 	: INT
 	| FLOAT
