@@ -24,7 +24,6 @@ driver::driver(std::string const& file_name)
     , file_name(file_name)
     , input(file_name)
     , scanner(&input)
-    , parser(*this)
 {
 }
 
