@@ -1,5 +1,3 @@
-# etapa2
-
 project('cpp-compiler', ['cpp', 'c'],
         version : '2.0',
         license : 'GPL-3.0-or-later',

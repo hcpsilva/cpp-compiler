@@ -29,7 +29,7 @@ root=$(readlink -f "$0" | xargs dirname | xargs dirname)
 
 pushd $root
 
-version=$(head -n 1 meson.build | cut -d ' ' -f2)
+version=$(grep 'BIN :=' Makefile | cut -d ' ' -f3)
 
 tar --exclude="${version}.tgz" \
     --exclude-vcs-ignores      \
