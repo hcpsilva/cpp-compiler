@@ -18,12 +18,9 @@
 #include <string>
 #include <fstream>
 
+#include "scanner.hh"
 #include "parser.hh"
-
-#define YY_DECL \
-        yy::parser::symbol_type yylex(hcpsilva::driver& driver)
-
-YY_DECL;
+#include "location.hh"
 
 namespace hcpsilva {
 
@@ -33,20 +30,23 @@ public:
 
     driver() = default;
 
-    int parse(std::string const& file_name);
+    auto parse() -> int;
 
-    int parse();
+    auto yylex() -> yy::parser::symbol_type { return this->scanner.lex(*this); }
 
-    void begin_scan();
+    auto swap_input(std::string const& file_name) -> void;
+    auto swap_input(std::ifstream& input)         -> void;
+    auto swap_input()                             -> void;
 
-    void end_scan();
-
-    yy::location location;
+    friend class yy::scanner;
+    friend class yy::parser;
 
 private:
-    std::string file_name;
-
-    std::ifstream input_file;
+    yy::location  location;
+    std::string   file_name;
+    std::ifstream input;
+    yy::scanner   scanner;
+    yy::parser    parser = yy::parser(*this);
 };
 
 }

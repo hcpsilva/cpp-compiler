@@ -22,6 +22,13 @@
 
 %code top {
 	#include "driver.hh"
+	#include "scanner.hh"
+	#include "parser.hh"
+	#include "location.hh"
+
+	static auto yylex(hcpsilva::driver& driver) -> yy::parser::symbol_type {
+		return driver.yylex();
+	}
 }
 
 /* the following options enable us more information when printing the

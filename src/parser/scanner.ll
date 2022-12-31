@@ -14,6 +14,9 @@
 %option nounput
 %option nomain
 %option noyywrap
+%option noyylineno
+%option c++
+%option yyclass="scanner"
 %option warn
 %option debug
 
@@ -23,8 +26,13 @@
 #include <string>
 #include <fmt/core.h>
 
-#include "driver.hh"
 #include "parser.hh"
+#include "location.hh"
+#include "scanner.hh"
+#include "driver.hh"
+
+#undef YY_DECL
+#define YY_DECL yy::parser::symbol_type yy::scanner::lex(hcpsilva::driver& driver)
 
 /* update the location of the tokens as they are recognized */
 #define YY_USER_ACTION loc.columns(yyleng);
@@ -33,6 +41,7 @@
 /* helpful character classes */
 WHITE [ \t\r]
 ALPHA [[:alpha:]]
+ALNUM [[:alnum:]]
 
 /* types */
 TYPE_INT "int"
@@ -79,12 +88,9 @@ SCI_NOT ([eE][+-]?{NUMBER}+)
 /* literals */
 LIT_TRUE "true"
 LIT_FALSE "false"
-/* delimiters (used to quit word mode) */
-DELIM [[:punct:][:blank:]]
 
 /* states */
 %x COMMENT
-%x WORD
 
 %%
 
@@ -105,7 +111,7 @@ DELIM [[:punct:][:blank:]]
 [^*[:blank:]\n]*
 "*"+[^*/[:blank:]\n]*
 {WHITE}+								 { loc.step(); }
-\n+										 { loc.lines(yyleng); loc.step(); }
+\n+										 { loc.lines(YYLeng()); loc.step(); }
 
 }
 
@@ -114,11 +120,6 @@ DELIM [[:punct:][:blank:]]
 
 
 	/* ----------  words section ---------- */
-
-{ALPHA}+								 { BEGIN(WORD); yyless(0); }
-
-	/* word state */
-<WORD>{
 
 	/* types */
 {TYPE_INT}								 { return yy::parser::make_INT(loc); }
@@ -140,11 +141,7 @@ DELIM [[:punct:][:blank:]]
 {LIT_FALSE}                              { return yy::parser::make_FALSE(false, loc); }
 
 	/* identifiers */
-{ALPHA}+								 { return yy::parser::make_IDENTIFIER(yytext, loc); }
-
-{DELIM}+						         { BEGIN(INITIAL); yyless(0); }
-
-}
+{ALPHA}+								 { return yy::parser::make_IDENTIFIER(YYText(), loc); }
 
 
 	/* ---------- special characters section ---------- */
@@ -170,7 +167,6 @@ DELIM [[:punct:][:blank:]]
 {OP_LOG_OR}                              { return yy::parser::make_OC_OR(loc); }
 
 	/* simple special tokens */
-
 {TK_COMMA}								 { return yy::parser::make_COMMA(loc); }
 {TK_SEMICOLON}							 { return yy::parser::make_SEMICOLON(loc); }
 {TK_COLON}								 { return yy::parser::make_COLON(loc); }
@@ -183,44 +179,26 @@ DELIM [[:punct:][:blank:]]
 	/* ---------- literals section ---------- */
 
 	/* character literals */
-"\'"[^\n]?"\'"							 { return yy::parser::make_CHARACTER(yytext[1], loc); }
+"\'"[^\n]?"\'"							 { return yy::parser::make_CHARACTER(YYText()[1], loc); }
 
 	/* float */
-[+-]?{NUMBER}+"."{NUMBER}+{SCI_NOT}?	 { return yy::parser::make_FLOATING_POINT(std::atof(yytext), loc); }
+[+-]?{NUMBER}+"."{NUMBER}+{SCI_NOT}?	 { return yy::parser::make_FLOATING_POINT(std::atof(YYText()), loc); }
 
 	/* integer */
-[+-]{NUMBER}+							 { return yy::parser::make_INTEGER(std::atoi(yytext), loc); }
+[+-]?{NUMBER}+							 { return yy::parser::make_INTEGER(std::atoi(YYText()), loc); }
+
 
 	/* ---------- misc section ---------- */
 	/* whitespace or newlines between tokens */
 {WHITE}+								 { loc.step(); }
 
-\n+										 { loc.lines(yyleng); loc.step(); }
+\n+										 { loc.lines(YYLeng()); loc.step(); }
 
 <<EOF>>									 { return yy::parser::make_YYEOF(loc); }
 
+{ALNUM}+								 { throw yy::parser::syntax_error(loc, fmt::format("syntax error, bad alphanumeric sequence \"{}\"", YYText())); }
+
 	/* error catch-all */
-<*>.									 { return yy::parser::make_ERROR(loc); }
+<*>.									 { throw yy::parser::syntax_error(loc, fmt::format("syntax error, unknown character '{}'", YYText())); }
 
 %%
-
-namespace hcpsilva {
-
-void driver::begin_scan()
-{
-	yyin = this->file_name.empty()
-		? stdin
-		: std::fopen(file_name.c_str(), "r");
-
-	if (!yyin) {
-		fmt::print(stderr, "ERROR: failed to open file {}: {}\n", this->file_name, strerror(errno));
-		exit(1);
-	}
-}
-
-void driver::end_scan()
-{
-	fclose(yyin);
-}
-
-}

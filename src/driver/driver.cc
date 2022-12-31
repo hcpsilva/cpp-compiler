@@ -13,40 +13,72 @@
 
 #include "driver.hh"
 
+#include <fstream>
 #include <iostream>
+#include <stdexcept>
 
 namespace hcpsilva {
 
 driver::driver(std::string const& file_name)
-    : file_name(file_name)
-    , input_file(file_name)
+    : location(&file_name)
+    , file_name(file_name)
+    , input(file_name)
+    , scanner(&input)
+    , parser(*this)
 {
 }
 
-int driver::parse(std::string const& file_name)
+auto driver::swap_input(std::string const& file_name) -> void
 {
-    std::istream& input = (!file_name.empty())
-        ? [&]() -> std::istream& {
-            this->input_file.open(file_name);
+    if (file_name.empty())
+        throw std::runtime_error("driver error, new input file name is empty\n");
 
-            if (!this->input_file)
-                abort(); // throw???
+    // TODO: maybe also check if the file exists... sigh. use std::filesystem
 
-            return this->input_file;
-        }()
-        : std::cin;
+    this->location.initialize(&file_name);
 
-    if (!file_name.empty()) {
-        this->location.initialize(&file_name);
-    } else {
-        this->location.initialize();
-    }
+    this->file_name = file_name;
 
-    yy::parser parser(*this);
+    if (this->input.is_open())
+        this->input.close();
 
-    // parser.
+    this->input = std::ifstream(file_name);
 
-    return parser.parse();
+    this->scanner.switch_streams(&this->input);
+}
+
+auto driver::swap_input(std::ifstream& input) -> void
+{
+    this->location.initialize();
+
+    this->file_name = "";
+
+    if (this->input.is_open())
+        this->input.close();
+
+    this->input.swap(input);    // WARN: generally not what one means to do?
+                                // swapping on input variables is perhaps bad
+                                // taste and we should instead receive a rvalue
+                                // reference
+
+    this->scanner.switch_streams(&this->input);
+}
+
+auto driver::swap_input() -> void
+{
+    this->location.initialize();
+
+    this->file_name = "";
+
+    if (this->input.is_open())
+        this->input.close();
+
+    this->scanner.switch_streams();
+}
+
+auto driver::parse(void) -> int
+{
+    return this->parser.parse();
 }
 
 }

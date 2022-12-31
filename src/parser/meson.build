@@ -3,7 +3,6 @@ lex = find_program('flex', required: true)
 yacc = find_program('bison', required: true)
 
 yacc_gen_sources = custom_target('yacc-generated-sources',
-                                 build_always : true,
                                  output : ['parser.cc', 'parser.hh', 'location.hh'],
                                  input : 'parser.yy',
                                  command : [yacc, '-Wall',
@@ -12,15 +11,13 @@ yacc_gen_sources = custom_target('yacc-generated-sources',
                                             '@INPUT@'])
 
 lex_gen_sources = custom_target('lex-generated-sources',
-                                build_always : true,
-                                output : ['scanner.cc', 'scanner.hh'],
-                                input : 'scanner.l',
+                                output : ['scanner.cc', 'FlexLexer.h'],
+                                input : 'scanner.ll',
                                 command : [lex,
                                            '--outfile=@OUTPUT0@',
-                                           '--header-file=@OUTPUT1@',
                                            '@INPUT@'])
 
-libparser_sources = files('scanner-tools.cc')
+libparser_sources = []
 
 # declare the library for the parser module
 libparser = library('cpp-compiler-parser',
@@ -31,5 +28,6 @@ libparser = library('cpp-compiler-parser',
                     dependencies: [fmt_dep, libutils_dep])
 
 libparser_dep = declare_dependency(sources : [yacc_gen_sources[1],
-                                              yacc_gen_sources[2]],
+                                              yacc_gen_sources[2],
+                                              lex_gen_sources[1]],
                                    link_with : libparser)
