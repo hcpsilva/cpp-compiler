@@ -96,7 +96,8 @@
 	RPAREN ")"
 	LCURLY "{"
 	RCURLY "}"
-	COLON ":"
+	LSQUARE "["
+	RSQUARE "]"
 	SEMICOLON ";"
 	COMMA ","
 ;
@@ -271,32 +272,34 @@ op_mul
 	;
 
 op_un
-	: tk_op_un op_un
-	| op_elem
+	: op_elem
+	| tk_op_un op_un
 	;
 
 op_elem
 	: IDENTIFIER
-	/* | IDENTIFIER index */ /* BUG: lots of conflicts! */
+	| IDENTIFIER index
 	| call
 	| literal
 	| LPAREN expr RPAREN
 	;
 
 	/* tokens of each expression rule */
-tk_op_eq
-	: OC_EQUAL
-	| OC_NOT_EQUAL
-	;
-
 tk_op_log
 	: OC_AND
 	| OC_OR
 	;
 
+tk_op_eq
+	: OC_EQUAL
+	| OC_NOT_EQUAL
+	;
+
 tk_op_cmp
 	: OC_LESS_EQUAL
 	| OC_GREATER_EQUAL
+	| LESS_THAN
+	| GREATER_THAN
 	;
 
 tk_op_add
@@ -328,7 +331,7 @@ literal
 	/* ---------- MISC ----------  */
 
 index_def
-	: COLON index_def_rep
+	: LSQUARE index_def_rep RSQUARE
 	;
 
 index_def_rep
@@ -337,7 +340,7 @@ index_def_rep
 	;
 
 index
-	: COLON index_rep
+	: LSQUARE index_rep RSQUARE
 	;
 
 index_rep

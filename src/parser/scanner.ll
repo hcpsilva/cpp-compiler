@@ -70,11 +70,12 @@ OP_GT ">"
 /* special punctuation */
 TK_COMMA ","
 TK_SEMICOLON ";"
-TK_COLON ":"
 TK_LPAREN "("
 TK_RPAREN ")"
 TK_LCURLY "{"
 TK_RCURLY "}"
+TK_LSQUARE "["
+TK_RSQUARE "]"
 /* composite operators */
 OP_LOG_LE "<="
 OP_LOG_GE ">="
@@ -169,11 +170,12 @@ LIT_FALSE "false"
 	/* simple special tokens */
 {TK_COMMA}								 { return yy::parser::make_COMMA(loc); }
 {TK_SEMICOLON}							 { return yy::parser::make_SEMICOLON(loc); }
-{TK_COLON}								 { return yy::parser::make_COLON(loc); }
 {TK_LPAREN}								 { return yy::parser::make_LPAREN(loc); }
 {TK_RPAREN}								 { return yy::parser::make_RPAREN(loc); }
 {TK_LCURLY}								 { return yy::parser::make_LCURLY(loc); }
 {TK_RCURLY}								 { return yy::parser::make_RCURLY(loc); }
+{TK_LSQUARE}							 { return yy::parser::make_LSQUARE(loc); }
+{TK_RSQUARE}							 { return yy::parser::make_RSQUARE(loc); }
 
 
 	/* ---------- literals section ---------- */
