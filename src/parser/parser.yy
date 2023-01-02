@@ -72,34 +72,34 @@
 
 /* operators */
 %token
-	PLUS			"+"
-	MINUS			"-"
-	STAR			"*"
-	SLASH			"/"
-	PERCENT			"%"
-	BANG			"!"
-	CARET			"^"
-	LESS_THAN       "<"
-	GREATER_THAN    ">"
-	EQUAL           "="
-	OC_LESS_EQUAL		"<="
-	OC_GREATER_EQUAL	">="
-	OC_EQUAL			"=="
-	OC_NOT_EQUAL		"!="
-	OC_AND				"&&"
-	OC_OR				"||"
+	PLUS                "+"
+	MINUS               "-"
+	STAR                "*"
+	SLASH               "/"
+	PERCENT             "%"
+	BANG                "!"
+	CARET               "^"
+	LESS_THAN           "<"
+	GREATER_THAN        ">"
+	EQUAL               "="
+	OC_LESS_EQUAL       "<="
+	OC_GREATER_EQUAL    ">="
+	OC_EQUAL            "=="
+	OC_NOT_EQUAL        "!="
+	OC_AND              "&&"
+	OC_OR               "||"
 ;
 
 /* special punctuation */
 %token
-	LPAREN "("
-	RPAREN ")"
-	LCURLY "{"
-	RCURLY "}"
-	LSQUARE "["
-	RSQUARE "]"
-	SEMICOLON ";"
-	COMMA ","
+	LPAREN      "("
+	RPAREN      ")"
+	LCURLY      "{"
+	RCURLY      "}"
+	LSQUARE     "["
+	RSQUARE     "]"
+	SEMICOLON   ";"
+	COMMA       ","
 ;
 
 /* error! */
@@ -357,7 +357,7 @@ type
 
 %%
 
-void yy::parser::error([[maybe_unused]] yy::location const& location, [[maybe_unused]] std::string const& message)
+void yy::parser::error([[maybe_unused]] yy::location const& location, std::string const& message)
 {
-	// fmt::print(stderr, "{} -> {}", location, message);
+	fmt::print(stderr, "{} -> {}\n", 2, message);
 }
