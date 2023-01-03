@@ -40,16 +40,7 @@ static bool read_a_line = true;
 
 /* update the location of the tokens as they are recognized */
 /* VERY evil code */
-#define YY_USER_ACTION                                                  \
-	loc.columns(yyleng);                                                \
-	last_token             = std::string(yytext);                       \
-	if (read_a_line) {                                                  \
-		if (yy_hold_char != '\0')                                       \
-			yytext[yyleng] = yy_hold_char;                              \
-		current_line       = strndup(yytext, std::strchr(yytext, '\n') - yytext); \
-		read_a_line        = false;                                     \
-		yytext[yyleng]     = '\0';                                      \
-	 }
+#define YY_USER_ACTION loc.columns(yyleng); this->on_new_token(yytext, yyleng, yy_hold_char);
 %}
 
 /* helpful character classes */
@@ -228,4 +219,24 @@ auto yy::scanner::get_current_line(void) -> std::string const&
 auto yy::scanner::get_last_token(void) -> std::string const&
 {
 	return this->last_token;
+}
+
+auto yy::scanner::on_new_token(char* yytext, int yyleng, char yy_hold_char) -> void
+{
+	this->last_token = std::string(yytext);
+
+	if (read_a_line) {
+		yytext[yyleng] = yy_hold_char;
+
+		auto	newline_index		= std::strchr(yytext, '\n') - yytext;
+		auto	newline_char_or_eos = yytext[newline_index];
+
+		yytext[newline_index] = '\0';
+		current_line          = std::string(yytext);
+		yytext[newline_index] = newline_char_or_eos;
+
+		yytext[yyleng] = '\0';
+
+		read_a_line = false;
+	}
 }

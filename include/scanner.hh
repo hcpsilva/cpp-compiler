@@ -29,6 +29,8 @@ private:
     std::string current_line;
 
     std::string last_token;
+
+    auto on_new_token(char* yytext, int yyleng, char yy_hold_char) -> void;
 };
 
 }

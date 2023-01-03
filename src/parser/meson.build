@@ -11,7 +11,7 @@ yacc_gen_sources = custom_target('yacc-generated-sources',
                                             '@INPUT@'])
 
 lex_gen_sources = custom_target('lex-generated-sources',
-                                output : ['scanner.cc', 'FlexLexer.h'],
+                                output : ['scanner.cc'],
                                 input : 'scanner.ll',
                                 command : [lex,
                                            '--outfile=@OUTPUT0@',
@@ -28,6 +28,5 @@ libparser = library('cpp-compiler-parser',
                     dependencies: [fmt_dep, libutils_dep])
 
 libparser_dep = declare_dependency(sources : [yacc_gen_sources[1],
-                                              yacc_gen_sources[2],
-                                              lex_gen_sources[1]],
+                                              yacc_gen_sources[2]],
                                    link_with : libparser)
