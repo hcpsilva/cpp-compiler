@@ -186,7 +186,7 @@ LIT_FALSE "false"
 	/* ---------- literals section ---------- */
 
 	/* character literals */
-"\'"[^\n]?"\'"                   { return yy::parser::make_CHARACTER(yyleng == 3 ? yytext[1] : '\0', loc); }
+"\'"[^\n]?"\'"                   { return yy::parser::make_CHARACTER(yyleng == 3 ? yytext[1] : '', loc); }
 
 	/* float */
 {NUMBER}+"."{NUMBER}+{SCI_NOT}?  { return yy::parser::make_FLOATING_POINT(std::atof(yytext), loc); }
