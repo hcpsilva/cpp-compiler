@@ -20,6 +20,15 @@ public:
         : yyFlexLexer(yyin, yyout) {}
 
     virtual auto lex(hcpsilva::driver& driver) -> parser::symbol_type;
+
+    auto get_current_line(void) -> std::string const&;
+
+    auto get_last_token(void) -> std::string const&;
+
+private:
+    std::string current_line;
+
+    std::string last_token;
 };
 
 }

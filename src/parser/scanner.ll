@@ -19,9 +19,11 @@
 %option yyclass="scanner"
 %option warn
 %option debug
+%option batch
 
 %{
 #include <cstdlib>
+#include <cstring>
 
 #include <string>
 #include <fmt/core.h>
@@ -31,11 +33,23 @@
 #include "scanner.hh"
 #include "driver.hh"
 
+static bool read_a_line = true;
+
 #undef YY_DECL
 #define YY_DECL yy::parser::symbol_type yy::scanner::lex(hcpsilva::driver& driver)
 
 /* update the location of the tokens as they are recognized */
-#define YY_USER_ACTION loc.columns(yyleng);
+/* VERY evil code */
+#define YY_USER_ACTION                                                  \
+	loc.columns(yyleng);                                                \
+	last_token             = std::string(yytext);                       \
+	if (read_a_line) {                                                  \
+		if (yy_hold_char != '\0')                                       \
+			yytext[yyleng] = yy_hold_char;                              \
+		current_line       = strndup(yytext, std::strchr(yytext, '\n') - yytext); \
+		read_a_line        = false;                                     \
+		yytext[yyleng]     = '\0';                                      \
+	 }
 %}
 
 /* helpful character classes */
@@ -96,9 +110,9 @@ LIT_FALSE "false"
 %%
 
 %{
-	// A handy shortcut to the location held by the driver.
-	yy::location& loc = driver.location;
-	// Code run each time yylex is called.
+	// a handy shortcut to the location held by the driver
+	auto& loc = driver.location;
+	// code run the first time yylex is called
 	loc.step();
 %}
 
@@ -112,7 +126,7 @@ LIT_FALSE "false"
 [^*[:blank:]\n]*
 "*"+[^*/[:blank:]\n]*
 {WHITE}+                         { loc.step(); }
-\n+                              { loc.lines(YYLeng()); loc.step(); }
+\n+                              { loc.lines(yyleng); loc.step(); }
 
 }
 
@@ -142,7 +156,7 @@ LIT_FALSE "false"
 {LIT_FALSE}                      { return yy::parser::make_FALSE(false, loc); }
 
 	/* identifiers */
-{ALPHA}+                         { return yy::parser::make_IDENTIFIER(YYText(), loc); }
+{ALPHA}+                         { return yy::parser::make_IDENTIFIER(yytext, loc); }
 
 
 	/* ---------- special characters section ---------- */
@@ -181,26 +195,37 @@ LIT_FALSE "false"
 	/* ---------- literals section ---------- */
 
 	/* character literals */
-"\'"[^\n]?"\'"                   { return yy::parser::make_CHARACTER(YYText()[1], loc); }
+"\'"[^\n]?"\'"                   { return yy::parser::make_CHARACTER(yyleng == 3 ? yytext[1] : '\0', loc); }
 
 	/* float */
-{NUMBER}+"."{NUMBER}+{SCI_NOT}?  { return yy::parser::make_FLOATING_POINT(std::atof(YYText()), loc); }
+{NUMBER}+"."{NUMBER}+{SCI_NOT}?  { return yy::parser::make_FLOATING_POINT(std::atof(yytext), loc); }
 
 	/* integer */
-{NUMBER}+                        { return yy::parser::make_INTEGER(std::atoi(YYText()), loc); }
+{NUMBER}+                        { return yy::parser::make_INTEGER(std::atoi(yytext), loc); }
 
 
 	/* ---------- misc section ---------- */
+
 	/* whitespace or newlines between tokens */
 {WHITE}+                         { loc.step(); }
 
-\n+                              { loc.lines(YYLeng()); loc.step(); }
+\n+                              { loc.lines(yyleng); loc.step(); read_a_line = true; }
 
 <<EOF>>                          { return yy::parser::make_YYEOF(loc); }
 
-{ALNUM}+                         { throw yy::parser::syntax_error(loc, fmt::format("syntax error, bad alphanumeric sequence \"{}\"", YYText())); }
+{ALNUM}+                         { throw yy::parser::syntax_error(loc, fmt::format("syntax error, bad alphanumeric sequence \"{}\"", yytext)); }
 
 	/* error catch-all */
-<*>.                             { throw yy::parser::syntax_error(loc, fmt::format("syntax error, unknown character '{}'", YYText())); }
+<*>.                             { throw yy::parser::syntax_error(loc, fmt::format("syntax error, unknown character '{}'", yytext)); }
 
 %%
+
+auto yy::scanner::get_current_line(void) -> std::string const&
+{
+	return this->current_line;
+}
+
+auto yy::scanner::get_last_token(void) -> std::string const&
+{
+	return this->last_token;
+}
