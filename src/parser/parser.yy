@@ -53,21 +53,21 @@
 
 /* types */
 %token
-	INT		"int"
-	FLOAT	"float"
-	BOOL	"bool"
-	CHAR	"char"
+	INT      "int type keyword"
+	FLOAT    "float type keyword"
+	BOOL     "bool type keyword"
+	CHAR     "char type keyword"
 ;
 
 /* reserved keywords */
 %token
-	IF		"if"
-	THEN	"then"
-	ELSE	"else"
-	WHILE	"while"
-	INPUT	"input"
-	OUTPUT	"output"
-	RETURN	"return"
+	IF      "if keyword"
+	THEN    "then keyword"
+	ELSE    "else keyword"
+	WHILE   "while keyword"
+	INPUT   "input keyword"
+	OUTPUT  "output keyword"
+	RETURN  "return keyword"
 ;
 
 /* operators */
@@ -106,11 +106,11 @@
 %token ERROR
 
 /* literals */
-%token <int> INTEGER			"integer literal"
-%token <double> FLOATING_POINT	"floating point literal"
-%token <bool> FALSE				"false"
-%token <bool> TRUE				"true"
-%token <char> CHARACTER			"character literal"
+%token <int> INTEGER            "integer literal"
+%token <double> FLOATING_POINT  "floating point literal"
+%token <bool> FALSE             "false literal"
+%token <bool> TRUE              "true literal"
+%token <char> CHARACTER         "character literal"
 %token <std::string> IDENTIFIER "identifier"
 
 %printer { fmt::print("{}", $$); } <*>;
