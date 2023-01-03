@@ -5,7 +5,7 @@ yacc = find_program('bison', required: true)
 yacc_gen_sources = custom_target('yacc-generated-sources',
                                  output : ['parser.cc', 'parser.hh', 'location.hh'],
                                  input : 'parser.yy',
-                                 command : [yacc, '-Wall',
+                                 command : [yacc, '-Wall', '-Wcounterexamples',
                                             '--output=@OUTPUT0@',
                                             '--header=@OUTPUT1@',
                                             '@INPUT@'])

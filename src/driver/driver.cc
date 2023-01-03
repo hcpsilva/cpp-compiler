@@ -58,7 +58,7 @@ auto driver::swap_input(std::ifstream& input) -> void
     this->input.swap(input);    // WARN: generally not what one means to do?
                                 // swapping on input variables is perhaps bad
                                 // taste and we should instead receive a rvalue
-                                // reference
+                                // reference if we were to do this
 
     this->scanner.switch_streams(&this->input);
 }
