@@ -357,7 +357,27 @@ type
 
 %%
 
-void yy::parser::error([[maybe_unused]] yy::location const& location, std::string const& message)
+auto yy::parser::error(yy::location const& location, std::string const& message) -> void
 {
-	fmt::print(stderr, "{} -> {}\n", 2, message);
+	auto const token = driver.scanner.get_last_token();
+	auto const complete_line = driver.scanner.get_current_line();
+	auto const first_col = location.begin.column;
+	auto const last_col = location.end.column;
+	auto underline_string = (char*) calloc(last_col + 1, sizeof (char));
+
+	auto aux_ptr = underline_string;
+
+	std::memset(aux_ptr, ' ', first_col - 1);
+	aux_ptr += first_col - 1;
+	*aux_ptr = '^';
+	std::memset(aux_ptr + 1, '~', last_col - first_col - 1);
+
+	fmt::print(stderr, "\n\n--\n\n");
+
+	fmt::print(stderr, "line {}: {} (read token = \"{}\")\n", location.begin.line, message, token);
+
+	fmt::print(stderr, "{}\t| {}\n", location.begin.line, complete_line);
+	fmt::print(stderr, "\t| {}\n", underline_string);
+
+	free(underline_string);
 }
