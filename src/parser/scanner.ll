@@ -23,7 +23,7 @@
 
 %{
 #include <cstdlib>
-#include <cstring>
+#include <string.h>
 
 #include <string>
 #include <fmt/core.h>
@@ -228,7 +228,7 @@ auto yy::scanner::on_new_token(char* yytext, int yyleng, char yy_hold_char) -> v
 	if (read_a_line) {
 		yytext[yyleng] = yy_hold_char;
 
-		auto	newline_index		= std::strchr(yytext, '\n') - yytext;
+		auto	newline_index		= strchrnul(yytext, '\n') - yytext;
 		auto	newline_char_or_eos = yytext[newline_index];
 
 		yytext[newline_index] = '\0';
