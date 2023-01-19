@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/bash
 
 ## release.sh
 #
@@ -30,11 +30,13 @@ root=$(readlink -f "$0" | xargs dirname | xargs dirname)
 pushd $root
 
 version=$(grep 'BIN :=' Makefile | cut -d ' ' -f3)
+wraps=(subprojects/*.wrap)
 
 tar --exclude="${version}.tgz" \
     --exclude-vcs-ignores      \
     --exclude-vcs              \
     --exclude-backups          \
+    "${wraps[@]/#/--add-file=}"\
     -cvzf "$version.tgz" .
 
 popd

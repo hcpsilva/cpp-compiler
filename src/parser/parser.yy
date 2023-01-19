@@ -372,7 +372,7 @@ auto yy::parser::error(yy::location const& location, std::string const& message)
 	*aux_ptr = '^';
 	std::memset(aux_ptr + 1, '~', last_col - first_col - 1);
 
-	fmt::print(stderr, "\n\n--\n\n");
+	fmt::print(stderr, "\n--\n");
 
 	fmt::print(stderr, "line {}: {} (read token = \"{}\")\n", location.begin.line, message, token);
 

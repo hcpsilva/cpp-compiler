@@ -36,6 +36,6 @@ setup:
 
 compile: setup
 	meson compile -C $(BUILD_DIR)
-	ln -fs $(shell readlink -f $(BUILD_DIR)/$(basename $(MAIN))) $(BIN)
+	ln -fs $(shell readlink -f $(BUILD_DIR)/$(SRC_DIR)/$(basename $(MAIN))) $(BIN)
 
 release: ; $(SCRIPT_DIR)/release.sh

@@ -37,7 +37,8 @@ etapa*
 packagecache/
 
 # Meson Wraps
-subprojects/*/
+!subprojects/*.wrap
+subprojects/*
 
 # Configurations (LSP, etc)
 .clangd
