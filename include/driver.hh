@@ -1,4 +1,4 @@
-/** @file tools.hpp
+/** @file driver.hh
  *
  * @copyright (C) 2022 Henrique Silva
  *

@@ -26,7 +26,9 @@
 	#include "parser.hh"
 	#include "location.hh"
 
-	static auto yylex(hcpsilva::driver& driver) -> yy::parser::symbol_type {
+	using namespace hcpsilva;
+
+	static auto yylex(driver& driver) -> yy::parser::symbol_type {
 		return driver.yylex();
 	}
 }
@@ -45,7 +47,7 @@
 
 %param { hcpsilva::driver& driver }
 
-%require "3.6"
+%require "3.8.1"
 %skeleton "lalr1.cc"
 %language "c++"
 

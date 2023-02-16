@@ -12,9 +12,9 @@
  */
 
 #include <stdio.h>
-#define _(s) \
-#s // https://gcc.gnu.org/onlinedocs/gcc-12.2.0/cpp/Stringizing.html
-#include "parser.tab.hpp"
+// https://gcc.gnu.org/onlinedocs/gcc-12.2.0/cpp/Stringizing.html
+#define _(s) #s
+#include "parser.hh"
 
 extern int yylex(void);
 extern int yylex_destroy(void);

@@ -1,4 +1,4 @@
-/** @file debug.hpp
+/** @file utils.hh
  *
  * @copyright (C) 2022 Henrique Silva
  *
@@ -20,30 +20,27 @@
 
 #include <string>
 
-namespace hcpsilva
-{
+namespace hcpsilva {
 
-template<typename... types>
-auto log(std::string const& format, types... arguments) -> void;
+template <typename... Args>
+auto log(std::string const& format, Args... arguments) -> void;
 
-template<typename... types>
-auto debug(std::string const& format, types... arguments) -> void;
-
+template <typename... Args>
+auto debug(std::string const& format, Args... arguments) -> void;
 }
 
 #ifdef VERBOSE
 #define V_PRINTF(f_, ...) printf((f_), ##__VA_ARGS__)
 #define V_PERROR(f_) perror((f_))
 #else
-#define V_PRINTF(f_, ...) ((void)0)
-#define V_PERROR(f_) ((void)0)
+#define V_PRINTF(f_, ...) ((void) 0)
+#define V_PERROR(f_) ((void) 0)
 #endif
 
 #ifdef DEBUG
-#define D_PRINTF(f_, ...) \
+#define D_PRINTF(f_, ...)                                         \
     fprintf(stderr, "%s:%d:%s():", __FILE__, __LINE__, __func__); \
     fprintf(stderr, (f_), ##__VA_ARGS__)
 #else
-#define D_PRINTF(f_, ...) ((void)0)
+#define D_PRINTF(f_, ...) ((void) 0)
 #endif
-
