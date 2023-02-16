@@ -32,6 +32,7 @@
 #include "location.hh"
 #include "scanner.hh"
 #include "driver.hh"
+#include "lexic_values.hh"
 
 static bool read_a_line = true;
 
@@ -128,19 +129,19 @@ LIT_FALSE "false"
 	/* ----------  words section ---------- */
 
 	/* types */
-{TYPE_INT}                       { return yy::parser::make_INT(loc); }
-{TYPE_FLOAT}                     { return yy::parser::make_FLOAT(loc); }
-{TYPE_BOOL}                      { return yy::parser::make_BOOL(loc); }
-{TYPE_CHAR}                      { return yy::parser::make_CHAR(loc); }
+{TYPE_INT}                       { return yy::parser::make_INT(hcpsilva::type::INT, loc);}
+{TYPE_FLOAT}                     { return yy::parser::make_FLOAT(hcpsilva::type::FLOAT, loc); }
+{TYPE_BOOL}                      { return yy::parser::make_BOOL(hcpsilva::type::BOOL, loc); }
+{TYPE_CHAR}                      { return yy::parser::make_CHAR(hcpsilva::type::CHAR, loc); }
 
 	/* reserved keywords */
-{RK_IF}                          { return yy::parser::make_IF(loc); }
+{RK_IF}                          { return yy::parser::make_IF(hcpsilva::keyword::IF, loc); }
 {RK_THEN}                        { return yy::parser::make_THEN(loc); }
 {RK_ELSE}                        { return yy::parser::make_ELSE(loc); }
-{RK_WHILE}                       { return yy::parser::make_WHILE(loc); }
-{RK_INPUT}                       { return yy::parser::make_INPUT(loc); }
-{RK_OUTPUT}                      { return yy::parser::make_OUTPUT(loc); }
-{RK_RETURN}                      { return yy::parser::make_RETURN(loc); }
+{RK_WHILE}                       { return yy::parser::make_WHILE(hcpsilva::keyword::WHILE, loc); }
+{RK_INPUT}                       { return yy::parser::make_INPUT(hcpsilva::keyword::INPUT, loc); }
+{RK_OUTPUT}                      { return yy::parser::make_OUTPUT(hcpsilva::keyword::OUTPUT, loc); }
+{RK_RETURN}                      { return yy::parser::make_RETURN(hcpsilva::keyword::RETURN, loc); }
 
 	/* boolean literals */
 {LIT_TRUE}                       { return yy::parser::make_TRUE(true, loc); }
@@ -153,24 +154,24 @@ LIT_FALSE "false"
 	/* ---------- special characters section ---------- */
 
 	/* simple operators */
-{OP_PLUS}                        { return yy::parser::make_PLUS(loc); }
-{OP_MINUS}                       { return yy::parser::make_MINUS(loc); }
-{OP_STAR}                        { return yy::parser::make_STAR(loc); }
-{OP_SLASH}                       { return yy::parser::make_SLASH(loc); }
-{OP_PERCENT}                     { return yy::parser::make_PERCENT(loc); }
-{OP_BANG}                        { return yy::parser::make_BANG(loc); }
-{OP_CARET}                       { return yy::parser::make_CARET(loc); }
-{OP_EQUAL}                       { return yy::parser::make_EQUAL(loc); }
-{OP_LT}                          { return yy::parser::make_LESS_THAN(loc); }
-{OP_GT}                          { return yy::parser::make_GREATER_THAN(loc); }
+{OP_PLUS}                        { return yy::parser::make_PLUS(hcpsilva::operation::POSITIVE, loc); }
+{OP_MINUS}                       { return yy::parser::make_MINUS(hcpsilva::operation::NEGATIVE, loc); }
+{OP_STAR}                        { return yy::parser::make_STAR(hcpsilva::operation::MULTIPLICATION, loc); }
+{OP_SLASH}                       { return yy::parser::make_SLASH(hcpsilva::operation::DIVISION, loc); }
+{OP_PERCENT}                     { return yy::parser::make_PERCENT(hcpsilva::operation::REST, loc); }
+{OP_BANG}                        { return yy::parser::make_BANG(hcpsilva::operation::NEGATION, loc); }
+{OP_CARET}                       { return yy::parser::make_CARET(hcpsilva::operation::INDEX_SEP, loc); }
+{OP_EQUAL}                       { return yy::parser::make_EQUAL(hcpsilva::operation::ATTRIBUTION, loc); }
+{OP_LT}                          { return yy::parser::make_LESS_THAN(hcpsilva::operation::LESS_THAN, loc); }
+{OP_GT}                          { return yy::parser::make_GREATER_THAN(hcpsilva::operation::GREATER_THAN, loc); }
 
 	/* composite operators */
-{OP_LOG_LE}                      { return yy::parser::make_OC_LESS_EQUAL(loc); }
-{OP_LOG_GE}                      { return yy::parser::make_OC_GREATER_EQUAL(loc); }
-{OP_LOG_EQ}                      { return yy::parser::make_OC_EQUAL(loc); }
-{OP_LOG_NE}                      { return yy::parser::make_OC_NOT_EQUAL(loc); }
-{OP_LOG_AND}                     { return yy::parser::make_OC_AND(loc); }
-{OP_LOG_OR}                      { return yy::parser::make_OC_OR(loc); }
+{OP_LOG_LE}                      { return yy::parser::make_OC_LESS_EQUAL(hcpsilva::operation::LESS_EQUAL, loc); }
+{OP_LOG_GE}                      { return yy::parser::make_OC_GREATER_EQUAL(hcpsilva::operation::GREATER_EQUAL, loc); }
+{OP_LOG_EQ}                      { return yy::parser::make_OC_EQUAL(hcpsilva::operation::EQUAL, loc); }
+{OP_LOG_NE}                      { return yy::parser::make_OC_NOT_EQUAL(hcpsilva::operation::NOT_EQUAL, loc); }
+{OP_LOG_AND}                     { return yy::parser::make_OC_AND(hcpsilva::operation::AND, loc); }
+{OP_LOG_OR}                      { return yy::parser::make_OC_OR(hcpsilva::operation::OR, loc); }
 
 	/* simple special tokens */
 {TK_COMMA}                       { return yy::parser::make_COMMA(loc); }

@@ -12,3 +12,8 @@ configure_file(
   output : '@BASENAME@',
   configuration : conf_inc
 )
+
+# template classes dependencies
+tree_dep = declare_dependency(sources : files('tree.hh'),
+                              dependencies : [fmt_dep])
+

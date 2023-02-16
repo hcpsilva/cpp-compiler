@@ -12,8 +12,12 @@
  */
 
 %code requires {
-	#include "fmt/core.h"
 	#include <string>
+	#include <optional>
+
+	#include "fmt/core.h"
+	#include "ast.hh"
+	#include "lexic_values.hh"
 
 	namespace hcpsilva {
 		class driver;
@@ -54,7 +58,7 @@
 %locations
 
 /* types */
-%token
+%token <hcpsilva::type>
 	INT      "int type keyword"
 	FLOAT    "float type keyword"
 	BOOL     "bool type keyword"
@@ -62,18 +66,22 @@
 ;
 
 /* reserved keywords */
-%token
+%token <hcpsilva::keyword>
 	IF      "if keyword"
-	THEN    "then keyword"
-	ELSE    "else keyword"
 	WHILE   "while keyword"
 	INPUT   "input keyword"
 	OUTPUT  "output keyword"
 	RETURN  "return keyword"
 ;
 
-/* operators */
+/* reserved keywords that aren't nodes */
 %token
+	THEN    "then keyword"
+	ELSE    "else keyword"
+;
+
+/* operators */
+%token <hcpsilva::operation>
 	PLUS                "+"
 	MINUS               "-"
 	STAR                "*"
@@ -115,17 +123,69 @@
 %token <char> CHARACTER         "character literal"
 %token <std::string> IDENTIFIER "identifier"
 
-%printer { fmt::print("{}", $$); } <*>;
+%type <hcpsilva::lexic_value> literal
+
+%type <std::string> header
+
+%type <hcpsilva::type> type
+
+%type <hcpsilva::operation>
+	tk_op_add
+	tk_op_cmp
+	tk_op_eq
+	tk_op_log
+	tk_op_mul
+	tk_op_un
+;
+
+/* rules and their types */
+%type <hcpsilva::ast_node>
+	function
+	expr
+	op_log op_eq op_cmp op_add op_mul op_un op_elem
+	call param_rep
+	index index_rep
+	id
+	atrib
+	control_flow
+	if
+	while
+	io
+	return
+;
+
+%type <std::optional<hcpsilva::ast_node>>
+	source
+	id_var_local
+	var_local
+	id_var_local_rep
+	block
+	command command_rep
+;
+
+%printer { fmt::print("{}\n", *$$); } <std::optional<hcpsilva::ast_node>>
+%printer { fmt::print("{}\n", $$); } <*>
 
 %%
+
+start
+	: source { driver.ast = std::move($1); }
+	;
 
 	/* ---------- GLOBAL SCOPE ---------- */
 
 	/* the source code can be empty, and variables require ';' */
 source
-	: %empty
-	| source global_var SEMICOLON
-	| source function
+	: %empty { $$ = std::nullopt; }
+	| source global_var SEMICOLON { $$ = std::move($1); }
+	| source function {
+		if ($1) {
+			$1->add_child(std::move($2));
+			$$ = std::move(*$1);
+		} else {
+			$$ = std::move($2);
+		}
+	}
 	;
 
 global_var
@@ -144,67 +204,83 @@ id_global_var
 	;
 
 function
-	: header block
+	: header block {
+		$$ = ast_node(std::move($1));
+		if ($2) $$.add_child(std::move(*$2));
+	}
 	;
 
 	/* definition parameters can be empty, as well as calling parameters */
 header
-	: type IDENTIFIER LPAREN def_params_rep RPAREN
-	| type IDENTIFIER LPAREN RPAREN
+	: type IDENTIFIER LPAREN decl_params_rep RPAREN { $$ = std::move($2); }
+	| type IDENTIFIER LPAREN RPAREN { $$ = std::move($2); }
 	;
 
-def_params_rep
-	: def_params
-	| def_params_rep COMMA def_params
+decl_params_rep
+	: decl_param
+	| decl_params_rep COMMA decl_param
 	;
 
-def_params
+decl_param
 	: type IDENTIFIER
 	;
 
 block
-	: LCURLY command_rep RCURLY
-	| LCURLY RCURLY
+	: LCURLY command_rep RCURLY { $$ = std::move($2); }
+	| LCURLY RCURLY { $$ = std::nullopt; }
 	;
 
 	/* ---------- COMMANDS ---------- */
 
 	/* commands are chained through ';' */
 command_rep
-	: command_rep command SEMICOLON
-	| command SEMICOLON
+	: command_rep command SEMICOLON {
+		if ($1 && $2) {
+			$1->add_child(std::move(*$2));
+			$$ = std::move(*$1);
+		} else if ($2) {
+			$$ = std::move(*$2);
+		}
+	}
+	| command SEMICOLON { $$ = std::move($1); }
 	;
 
 command
-	: atrib
-	| var_local
-	| control_flow
-	| io
-	| return
-	| call
-	| block
+	: atrib { $$ = std::move($1); }
+	| var_local { $$ = std::move($1); }
+	| control_flow { $$ = std::move($1); }
+	| io { $$ = std::move($1); }
+	| return { $$ = std::move($1); }
+	| call { $$ = std::move($1); }
+	| block { $$ = std::move($1); }
 	;
 
 	/* we use "=" in attributions, as expected */
 atrib
-	: IDENTIFIER EQUAL expr
-	| IDENTIFIER index EQUAL expr
+	: id EQUAL expr { $$ = ast_node($2, std::move($1), std::move($3)); }
 	;
 
 var_local
-	: type id_var_local_rep
+	: type id_var_local_rep { $$ = std::move($2); }
 	;
 
 	/* again, we can have multiple variables being declared at once */
 id_var_local_rep
-	: id_var_local
-	| id_var_local_rep COMMA id_var_local
+	: id_var_local { $$ = std::move($1); }
+	| id_var_local_rep COMMA id_var_local {
+		if ($1 && $3) {
+			$1->add_child(std::move(*$3));
+			$$ = std::move(*$1);
+		} else if ($3) {
+			$$ = std::move(*$3);
+		}
+	}
 	;
 
 	/* and they can be initialized (using "<=", for some reason) */
 id_var_local
-	: IDENTIFIER
-	| IDENTIFIER OC_LESS_EQUAL literal
+	: IDENTIFIER { $$ = std::nullopt; }
+	| IDENTIFIER OC_LESS_EQUAL literal { $$ = ast_node(operation::INITIALIZATION, ast_node(std::move($1)), ast_node(std::move($3))); }
 	;
 
 control_flow
@@ -213,77 +289,89 @@ control_flow
 	;
 
 if
-	: IF LPAREN expr RPAREN THEN block
-	| IF LPAREN expr RPAREN THEN block ELSE block
+	: IF LPAREN expr RPAREN THEN block {
+		$$ = ast_node($1, std::move($3));
+		if ($6) $$.add_child(std::move(*$6));
+	}
+	| IF LPAREN expr RPAREN THEN block ELSE block {
+		$$ = ast_node($1, std::move($3));
+		if ($6) $$.add_child(std::move(*$6));
+		if ($8) $$.add_child(std::move(*$8));
+	}
 	;
 
 while
-	: WHILE LPAREN expr RPAREN block
+	: WHILE LPAREN expr RPAREN block {
+		$$ = ast_node($1, std::move($3));
+		if ($5) $$.add_child(std::move(*$5));
+	}
 	;
 
 io
-	: INPUT IDENTIFIER
-	| OUTPUT IDENTIFIER
-	| OUTPUT literal
+	: INPUT id { $$ = ast_node($1, std::move($2)); }
+	| OUTPUT id { $$ = ast_node($1, std::move($2)); }
+	| OUTPUT literal { $$ = ast_node($1, ast_node(std::move($2))); }
 	;
 
 return
-	: RETURN expr
+	: RETURN expr { $$ = ast_node($1, std::move($2)); }
 	;
 
 call
-	: IDENTIFIER LPAREN param_rep RPAREN
-	| IDENTIFIER LPAREN RPAREN
+	: IDENTIFIER LPAREN param_rep RPAREN { $$ = ast_node(std::move($1), std::move($3)); }
+	| IDENTIFIER LPAREN RPAREN { $$ = ast_node(std::move($1)); }
 	;
 
 param_rep
-	: expr
-	| param_rep COMMA expr
+	: expr { $$ = std::move($1); }
+	| param_rep COMMA expr {
+		$1.add_child(std::move($3));
+		$$ = std::move($1);
+	}
 	;
 
 	/* ---------- EXPRESSIONS ---------- */
 
 	/* the expression rules are implemented following precedence orders */
 expr
-	: op_log
+	: op_log { $$ = std::move($1); }
 	;
 
 op_log
-	: op_eq
-	| op_eq tk_op_log op_log
+	: op_eq { $$ = std::move($1); }
+	| op_eq tk_op_log op_log { $$ = ast_node($2, std::move($1), std::move($3)); }
 	;
 
 op_eq
-	: op_cmp
-	| op_cmp tk_op_eq op_eq
+	: op_cmp { $$ = std::move($1); }
+	| op_cmp tk_op_eq op_eq { $$ = ast_node($2, std::move($1), std::move($3)); }
 	;
 
 op_cmp
-	: op_add
-	| op_add tk_op_cmp op_cmp
+	: op_add { $$ = std::move($1); }
+	| op_add tk_op_cmp op_cmp { $$ = ast_node($2, std::move($1), std::move($3)); }
 	;
 
 op_add
-	: op_mul
-	| op_mul tk_op_add op_add
+	: op_mul { $$ = std::move($1); }
+	| op_mul tk_op_add op_add { $$ = ast_node($2, std::move($1), std::move($3)); }
 	;
 
 op_mul
-	: op_un
-	| op_un tk_op_mul op_mul
+	: op_un { $$ = std::move($1); }
+	| op_un tk_op_mul op_mul { $$ = ast_node($2, std::move($1), std::move($3)); }
 	;
 
 op_un
-	: op_elem
-	| tk_op_un op_un
+	: op_elem { $$ = std::move($1); }
+	| tk_op_un op_un { $$ = ast_node($1, std::move($2)); }
 	;
 
 op_elem
-	: IDENTIFIER
-	| IDENTIFIER index
-	| call
-	| literal
-	| LPAREN expr RPAREN
+	: id { $$ = std::move($1); }
+	| call { $$ = std::move($1); }
+	| literal { $$ = ast_node($1); }
+	| LPAREN expr RPAREN { $$ = std::move($2); }
 	;
 
 	/* tokens of each expression rule */
@@ -323,14 +411,19 @@ tk_op_un
 	/* ---------- LITERALS ----------  */
 
 literal
-	: INTEGER
-	| FLOATING_POINT
-	| TRUE
-	| FALSE
-	| CHARACTER
+	: INTEGER { $$ = $1; }
+	| FLOATING_POINT { $$ = $1; }
+	| TRUE { $$ = $1; }
+	| FALSE { $$ = $1; }
+	| CHARACTER { $$ = $1; }
 	;
 
 	/* ---------- MISC ----------  */
+
+id
+	: IDENTIFIER { $$ = ast_node(std::move($1)); }
+	| IDENTIFIER index { $$ = ast_node(operation::INDEX, ast_node(std::move($1)), std::move($2)); }
+	;
 
 index_def
 	: LSQUARE index_def_rep RSQUARE
@@ -342,12 +435,12 @@ index_def_rep
 	;
 
 index
-	: LSQUARE index_rep RSQUARE
+	: LSQUARE index_rep RSQUARE { $$ = std::move($2); }
 	;
 
 index_rep
-	: expr
-	| index_rep CARET expr
+	: expr { $$ = ast_node(operation::INDEX_SEP, std::move($1)); }
+	| index_rep CARET expr { $$ = ast_node($2, std::move($1), std::move($3)); }
 	;
 
 type

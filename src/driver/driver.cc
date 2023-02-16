@@ -80,4 +80,12 @@ auto driver::parse(void) -> int
     return this->parser.parse();
 }
 
+auto driver::print_ast() -> void
+{
+    if (this->ast) {
+        this->ast->print();
+        this->ast->print_edges();
+    }
+}
+
 }

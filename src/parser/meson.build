@@ -25,8 +25,9 @@ libparser = library('cpp-compiler-parser',
                                lex_gen_sources,
                                libparser_sources],
                     include_directories : include_dir,
-                    dependencies: [fmt_dep, libutils_dep])
+                    dependencies : libutils_dep)
 
 libparser_dep = declare_dependency(sources : [yacc_gen_sources[1],
                                               yacc_gen_sources[2]],
-                                   link_with : libparser)
+                                   link_with : libparser,
+                                   dependencies : libutils_dep)

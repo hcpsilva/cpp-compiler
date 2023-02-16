@@ -13,14 +13,18 @@
 
 #pragma once
 
+#include <fstream>
 #include <istream>
 #include <map>
 #include <string>
-#include <fstream>
+#include <optional>
 
-#include "scanner.hh"
-#include "parser.hh"
+#include "ast.hh"
+#include "lexic_values.hh"
 #include "location.hh"
+#include "parser.hh"
+#include "scanner.hh"
+#include "tree.hh"
 
 namespace hcpsilva {
 
@@ -35,8 +39,10 @@ public:
     auto yylex() -> yy::parser::symbol_type { return this->scanner.lex(*this); }
 
     auto swap_input(std::string const& file_name) -> void;
-    auto swap_input(std::ifstream& input)         -> void;
-    auto swap_input()                             -> void;
+    auto swap_input(std::ifstream& input) -> void;
+    auto swap_input() -> void;
+
+    auto print_ast() -> void;
 
     friend class yy::scanner;
     friend class yy::parser;
@@ -46,6 +52,7 @@ private:
     std::string   file_name;
     std::ifstream input;
     yy::scanner   scanner;
+    std::optional<tree_node<lexic_value>> ast;
     yy::parser    parser = yy::parser(*this);
 };
 

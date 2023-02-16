@@ -1,6 +1,7 @@
 # traverse modules
 subdir('utils')
 subdir('parser')
+subdir('semantic')
 subdir('driver')
 
 # stage_1 = executable('stage-1', files('stage-1.cc'),
