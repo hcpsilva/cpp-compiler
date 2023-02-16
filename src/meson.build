@@ -9,7 +9,12 @@ subdir('driver')
 #                      install : true)
 
 stage_2 = executable('stage-2', files('stage-2.cc'),
-                     dependencies : [fmt_dep, libparser_dep, libdriver_dep],
+                     dependencies : libdriver_dep,
+                     include_directories : include_dir,
+                     install : true)
+
+stage_3 = executable('stage-3', files('stage-3.cc'),
+                     dependencies : libdriver_dep,
                      include_directories : include_dir,
                      install : true)
 
