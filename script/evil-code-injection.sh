@@ -3,6 +3,13 @@
 set -x
 
 FILE="$1"
+MAIN="$2"
+
+if [ ! -f "$MAIN" ]; then
+    exit 0
+else
+    mv "$MAIN" "$FILE"
+fi
 
 if [ -n "$(grep 'parser.tab.h' $FILE)" ]; then
     sed -i 's/parser.tab.h/evil-include.hh/' "$FILE"

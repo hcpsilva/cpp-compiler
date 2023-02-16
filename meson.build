@@ -1,12 +1,12 @@
 project('cpp-compiler', ['cpp', 'c'],
-        version : '2.0',
+        version : '3.0',
         license : 'GPL-3.0-or-later',
         default_options : [
           'warning_level=3',
           'buildtype=debug',
           'debug=true'])
 
-add_project_arguments('-std=gnu++2b', language: 'cpp')
+add_project_arguments('-std=gnu++20', language: 'cpp')
 
 fs = import('fs')
 

@@ -18,8 +18,8 @@ BUILD_DIR := build
 SCRIPT_DIR := script
 SRC_DIR := src
 
-BIN := etapa2
-MAIN := stage-2.cc
+BIN := etapa3
+MAIN := stage-3.cc
 
 .DEFAULT_GOAL = all
 
@@ -30,9 +30,8 @@ all: compile
 
 setup:
 	rm -rf $(BUILD_DIR)
-	-test -f main.c && mv main.c $(SRC_DIR)/$(MAIN)
-	$(SCRIPT_DIR)/evil-code-injection.sh $(SRC_DIR)/$(MAIN)
-	meson setup $(BUILD_DIR)
+	rm -f main.c
+	meson setup --buildtype=plain --debug=false $(BUILD_DIR)
 
 compile: setup
 	meson compile -C $(BUILD_DIR)
