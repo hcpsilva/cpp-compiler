@@ -134,8 +134,8 @@ auto tree_node<T>::print() const -> void
 template <typename T>
 auto tree_node<T>::print_edges() const -> void
 {
-    auto const edge_print = [](tree_node<T> const* from, tree_node<T> const* to) {
-        fmt::print("\"{}\" -> \"{}\"\n", fmt::ptr(from), fmt::ptr(to));
+    constexpr auto edge_print = [](tree_node<T> const* from, tree_node<T> const* to) {
+        fmt::print("{}, {}\n", fmt::ptr(from), fmt::ptr(to));
     };
 
     for (auto const& child : this->children) {
