@@ -13,11 +13,12 @@
 
 #pragma once
 
-#include "fmt/format.h"
 #include <concepts>
 #include <functional>
-#include <vector>
+#include <memory>
+#include <optional>
 #include <ranges>
+#include <vector>
 
 #include <fmt/core.h>
 #include <fmt/format.h>
@@ -26,8 +27,9 @@ namespace hcpsilva {
 
 template <typename T>
 struct tree_node {
-    T                         value;
-    std::vector<tree_node<T>> children;
+    T                             value;
+    std::vector<tree_node<T>>     children;
+    std::shared_ptr<tree_node<T>> next = nullptr; // a child, but special (i.e. a hack)
 
     auto add_child(tree_node<T> const& child) -> void;
 
@@ -36,9 +38,13 @@ struct tree_node {
     template <std::same_as<tree_node<T>>... nodes>
     auto add_children(nodes&&... children) -> void
     {
-        this->children.reserve(sizeof ...(nodes));
+        this->children.reserve(sizeof...(nodes));
         (this->children.push_back(std::forward<nodes>(children)), ...);
     }
+
+    auto add_next(tree_node<T> const& child) -> void;
+
+    auto add_next(tree_node<T>&& child) -> void;
 
     auto print() const -> void;
 
@@ -94,21 +100,54 @@ auto tree_node<T>::add_child(tree_node<T>&& child) -> void
 }
 
 template <typename T>
+auto tree_node<T>::add_next(tree_node<T> const& child) -> void
+{
+    if (this->next != nullptr) {
+        next->add_next(child);
+    } else {
+        next = std::make_shared<tree_node<T>>(child);
+    }
+}
+
+template <typename T>
+auto tree_node<T>::add_next(tree_node<T>&& child) -> void
+{
+    if (this->next != nullptr) {
+        next->add_next(std::move(child));
+    } else {
+        next = std::make_shared<tree_node<T>>(std::move(child));
+    }
+}
+
+template <typename T>
 auto tree_node<T>::print() const -> void
 {
-    fmt::print("{} [label=\"{}\"]\n", fmt::ptr(this), this->value);
+    fmt::print("\"{}\" [label=\"{}\"]\n", fmt::ptr(this), this->value);
 
     for (auto const& child : this->children)
         child.print();
+
+    if (this->next != nullptr)
+        this->next->print();
 }
 
 template <typename T>
 auto tree_node<T>::print_edges() const -> void
 {
+    auto const edge_print = [](tree_node<T> const* from, tree_node<T> const* to) {
+        fmt::print("\"{}\" -> \"{}\"\n", fmt::ptr(from), fmt::ptr(to));
+    };
+
     for (auto const& child : this->children) {
-        fmt::print("{}, {}\n", fmt::ptr(this), fmt::ptr(&child));
+        edge_print(this, &child);
 
         child.print_edges();
+    }
+
+    if (this->next != nullptr) {
+        edge_print(this, this->next.get());
+
+        this->next->print_edges();
     }
 }
 
@@ -139,4 +178,3 @@ struct fmt::formatter<hcpsilva::tree_node<T>> : formatter<std::string> {
         return fmt::format_to(ctx.out(), "{}", node.value);
     }
 };
-

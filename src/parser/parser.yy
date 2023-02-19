@@ -180,7 +180,7 @@ source
 	| source global_var SEMICOLON { $$ = std::move($1); }
 	| source function {
 		if ($1) {
-			$1->add_child(std::move($2));
+			$1->add_next(std::move($2));
 			$$ = std::move(*$1);
 		} else {
 			$$ = std::move($2);
@@ -236,7 +236,7 @@ block
 command_rep
 	: command_rep command SEMICOLON {
 		if ($1 && $2) {
-			$1->add_child(std::move(*$2));
+			$1->add_next(std::move(*$2));
 			$$ = std::move(*$1);
 		} else if ($2) {
 			$$ = std::move(*$2);
@@ -269,7 +269,7 @@ id_var_local_rep
 	: id_var_local { $$ = std::move($1); }
 	| id_var_local_rep COMMA id_var_local {
 		if ($1 && $3) {
-			$1->add_child(std::move(*$3));
+			$1->add_next(std::move(*$3));
 			$$ = std::move(*$1);
 		} else if ($3) {
 			$$ = std::move(*$3);
