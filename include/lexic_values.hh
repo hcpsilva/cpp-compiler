@@ -64,7 +64,7 @@ enum class operation {
     INDEX_SEP
 };
 
-using lexic_value = std::variant<type, keyword, operation, int, bool, double, char, std::string>;
+using lexic_value = std::variant<std::monostate, type, keyword, operation, int, bool, double, char, std::string>;
 
 template <typename type_to_check, typename... types_to_check_against>
 concept type_in = (std::same_as<std::remove_cvref_t<type_to_check>, types_to_check_against> || ...);
@@ -83,3 +83,21 @@ struct fmt::formatter<T> : formatter<std::string> {
     }
 };
 
+template <>
+struct fmt::formatter<hcpsilva::lexic_value> {
+    template <typename ParseContext>
+    auto parse(ParseContext& ctx) -> decltype(ctx.begin())
+    {
+        return ctx.begin();
+    }
+
+    template <typename FormatContext>
+    auto format(hcpsilva::lexic_value const& val, FormatContext& ctx) const -> decltype(ctx.out())
+    {
+        auto out = ctx.out();
+
+        std::visit([&](auto const& v) { out = detail::write<char>(out, v); }, val);
+
+        return out;
+    }
+};
