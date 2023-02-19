@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include <algorithm>
+#include <cctype>
 #include <concepts>
 #include <ostream>
 #include <string>
@@ -79,7 +81,15 @@ struct fmt::formatter<T> : formatter<std::string> {
     template <typename FormatContext>
     auto format(T const& value, FormatContext& ctx) const
     {
-        return fmt::formatter<std::string>::format(std::string(magic_enum::enum_name(value)), ctx);
+        auto name = std::string(magic_enum::enum_name(value));
+
+        // please use ASCII, don't break my code. maybe i'll use an unicode
+        // formatting library in the future. until then, just ASCII. that being
+        // said, this will break only if you, for some reason, think it's a
+        // good idea to add enum members in unicode.
+        std::transform(name.begin(), name.end(), name.begin(), [](unsigned char c) { return std::tolower(c); });
+
+        return fmt::formatter<std::string>::format(name, ctx);
     }
 };
 
@@ -99,5 +109,75 @@ struct fmt::formatter<hcpsilva::lexic_value> {
         std::visit([&](auto const& v) { out = detail::write<char>(out, v); }, val);
 
         return out;
+    }
+};
+
+template <>
+struct fmt::formatter<hcpsilva::operation> : formatter<std::string> {
+    template <typename FormatContext>
+    auto format(hcpsilva::operation const& op, FormatContext& ctx)
+    {
+        std::string op_name;
+
+        switch (op) {
+        case hcpsilva::operation::ATTRIBUTION:
+            op_name = "=";
+            break;
+        case hcpsilva::operation::INITIALIZATION:
+            op_name = "<=";
+            break;
+        case hcpsilva::operation::DIVISION:
+            op_name = "/";
+            break;
+        case hcpsilva::operation::MULTIPLICATION:
+            op_name = "*";
+            break;
+        case hcpsilva::operation::POSITIVE:
+            op_name = "+";
+            break;
+        case hcpsilva::operation::NEGATIVE:
+            op_name = "-";
+            break;
+        case hcpsilva::operation::NEGATION:
+            op_name = "!";
+            break;
+        case hcpsilva::operation::REST:
+            op_name = "%";
+            break;
+        case hcpsilva::operation::LESS_THAN:
+            op_name = "<";
+            break;
+        case hcpsilva::operation::LESS_EQUAL:
+            op_name = "<=";
+            break;
+        case hcpsilva::operation::GREATER_THAN:
+            op_name = ">";
+            break;
+        case hcpsilva::operation::GREATER_EQUAL:
+            op_name = ">=";
+            break;
+        case hcpsilva::operation::EQUAL:
+            op_name = "==";
+            break;
+        case hcpsilva::operation::NOT_EQUAL:
+            op_name = "!=";
+            break;
+        case hcpsilva::operation::AND:
+            op_name = "&&";
+            break;
+        case hcpsilva::operation::OR:
+            op_name = "||";
+            break;
+        case hcpsilva::operation::INDEX:
+            op_name = "[]";
+            break;
+        case hcpsilva::operation::INDEX_SEP:
+            op_name = "^";
+            break;
+        default:
+            op_name = std::string(magic_enum::enum_name(op));
+        }
+
+        return fmt::formatter<std::string>::format(op_name, ctx);
     }
 };
