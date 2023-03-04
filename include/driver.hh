@@ -16,14 +16,15 @@
 #include <fstream>
 #include <istream>
 #include <map>
-#include <string>
 #include <optional>
+#include <string>
 
 #include "ast.hh"
 #include "lexic_values.hh"
 #include "location.hh"
 #include "parser.hh"
 #include "scanner.hh"
+#include "symbol.hh"
 #include "tree.hh"
 
 namespace hcpsilva {
@@ -48,12 +49,13 @@ public:
     friend class yy::parser;
 
 private:
-    yy::location  location;
-    std::string   file_name;
-    std::ifstream input;
-    yy::scanner   scanner;
-    std::optional<tree_node<lexic_value>> ast;
-    yy::parser    parser = yy::parser(*this);
+    yy::location            location;
+    std::string             file_name;
+    std::ifstream           input;
+    yy::scanner             scanner;
+    std::optional<ast_node> ast;
+    symbol_hash_table       symbol_table;
+    yy::parser              parser = yy::parser(*this);
 };
 
 }

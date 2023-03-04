@@ -58,7 +58,7 @@
 %locations
 
 /* types */
-%token <hcpsilva::type>
+%token <hcpsilva::types>
 	INT      "int type keyword"
 	FLOAT    "float type keyword"
 	BOOL     "bool type keyword"
@@ -66,7 +66,7 @@
 ;
 
 /* reserved keywords */
-%token <hcpsilva::keyword>
+%token <hcpsilva::keywords>
 	IF      "if keyword"
 	WHILE   "while keyword"
 	INPUT   "input keyword"
@@ -81,7 +81,7 @@
 ;
 
 /* operators */
-%token <hcpsilva::operation>
+%token <hcpsilva::operations>
 	PLUS                "+"
 	MINUS               "-"
 	STAR                "*"
@@ -127,9 +127,9 @@
 
 %type <std::string> header
 
-%type <hcpsilva::type> type
+%type <hcpsilva::types> type
 
-%type <hcpsilva::operation>
+%type <hcpsilva::operations>
 	tk_op_add
 	tk_op_cmp
 	tk_op_eq
@@ -280,7 +280,7 @@ id_var_local_rep
 	/* and they can be initialized (using "<=", for some reason) */
 id_var_local
 	: IDENTIFIER { $$ = std::nullopt; }
-	| IDENTIFIER OC_LESS_EQUAL literal { $$ = ast_node(operation::INITIALIZATION, ast_node(std::move($1)), ast_node(std::move($3))); }
+	| IDENTIFIER OC_LESS_EQUAL literal { $$ = ast_node(operations::INITIALIZATION, ast_node(std::move($1)), ast_node(std::move($3))); }
 	;
 
 control_flow
@@ -422,7 +422,7 @@ literal
 
 id
 	: IDENTIFIER { $$ = ast_node(std::move($1)); }
-	| IDENTIFIER index { $$ = ast_node(operation::INDEX, ast_node(std::move($1)), std::move($2)); }
+	| IDENTIFIER index { $$ = ast_node(operations::INDEX, ast_node(std::move($1)), std::move($2)); }
 	;
 
 index_def
@@ -439,7 +439,7 @@ index
 	;
 
 index_rep
-	: expr { $$ = ast_node(operation::INDEX_SEP, std::move($1)); }
+	: expr { $$ = ast_node(operations::INDEX_SEP, std::move($1)); }
 	| index_rep CARET expr { $$ = ast_node($2, std::move($1), std::move($3)); }
 	;
 

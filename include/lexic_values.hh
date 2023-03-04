@@ -29,7 +29,7 @@
 
 namespace hcpsilva {
 
-enum class keyword {
+enum class keywords {
     IF,
     WHILE,
     INPUT,
@@ -37,14 +37,14 @@ enum class keyword {
     RETURN
 };
 
-enum class type {
+enum class types {
     INT,
     FLOAT,
     CHAR,
     BOOL
 };
 
-enum class operation {
+enum class operations {
     ATTRIBUTION,
     INITIALIZATION,
     DIVISION,
@@ -65,13 +65,13 @@ enum class operation {
     INDEX_SEP
 };
 
-using lexic_value = std::variant<std::monostate, type, keyword, operation, int, bool, double, char, std::string>;
+using lexic_value = std::variant<std::monostate, types, keywords, operations, int, bool, double, char, std::string>;
 
 template <typename type_to_check, typename... types_to_check_against>
 concept type_in = (std::same_as<std::remove_cvref_t<type_to_check>, types_to_check_against> || ...);
 
 template <class T>
-concept is_custom_ast_node = type_in<operation, keyword, type>;
+concept is_custom_ast_node = type_in<operations, keywords, types>;
 }
 
 template <typename T>
@@ -112,65 +112,65 @@ struct fmt::formatter<hcpsilva::lexic_value> {
 };
 
 template <>
-struct fmt::formatter<hcpsilva::operation> : formatter<std::string> {
+struct fmt::formatter<hcpsilva::operations> : formatter<std::string> {
     template <typename FormatContext>
-    auto format(hcpsilva::operation const& op, FormatContext& ctx)
+    auto format(hcpsilva::operations const& op, FormatContext& ctx)
     {
         std::string op_name;
 
         switch (op) {
-        case hcpsilva::operation::ATTRIBUTION:
+        case hcpsilva::operations::ATTRIBUTION:
             op_name = "=";
             break;
-        case hcpsilva::operation::INITIALIZATION:
+        case hcpsilva::operations::INITIALIZATION:
             op_name = "<=";
             break;
-        case hcpsilva::operation::DIVISION:
+        case hcpsilva::operations::DIVISION:
             op_name = "/";
             break;
-        case hcpsilva::operation::MULTIPLICATION:
+        case hcpsilva::operations::MULTIPLICATION:
             op_name = "*";
             break;
-        case hcpsilva::operation::POSITIVE:
+        case hcpsilva::operations::POSITIVE:
             op_name = "+";
             break;
-        case hcpsilva::operation::NEGATIVE:
+        case hcpsilva::operations::NEGATIVE:
             op_name = "-";
             break;
-        case hcpsilva::operation::NEGATION:
+        case hcpsilva::operations::NEGATION:
             op_name = "!";
             break;
-        case hcpsilva::operation::REST:
+        case hcpsilva::operations::REST:
             op_name = "%";
             break;
-        case hcpsilva::operation::LESS_THAN:
+        case hcpsilva::operations::LESS_THAN:
             op_name = "<";
             break;
-        case hcpsilva::operation::LESS_EQUAL:
+        case hcpsilva::operations::LESS_EQUAL:
             op_name = "<=";
             break;
-        case hcpsilva::operation::GREATER_THAN:
+        case hcpsilva::operations::GREATER_THAN:
             op_name = ">";
             break;
-        case hcpsilva::operation::GREATER_EQUAL:
+        case hcpsilva::operations::GREATER_EQUAL:
             op_name = ">=";
             break;
-        case hcpsilva::operation::EQUAL:
+        case hcpsilva::operations::EQUAL:
             op_name = "==";
             break;
-        case hcpsilva::operation::NOT_EQUAL:
+        case hcpsilva::operations::NOT_EQUAL:
             op_name = "!=";
             break;
-        case hcpsilva::operation::AND:
+        case hcpsilva::operations::AND:
             op_name = "&&";
             break;
-        case hcpsilva::operation::OR:
+        case hcpsilva::operations::OR:
             op_name = "||";
             break;
-        case hcpsilva::operation::INDEX:
+        case hcpsilva::operations::INDEX:
             op_name = "[]";
             break;
-        case hcpsilva::operation::INDEX_SEP:
+        case hcpsilva::operations::INDEX_SEP:
             op_name = "^";
             break;
         default:
