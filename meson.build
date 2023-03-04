@@ -3,8 +3,7 @@ project('cpp-compiler', ['cpp', 'c'],
         license : 'GPL-3.0-or-later',
         default_options : [
           'warning_level=3',
-          'buildtype=debug',
-          'debug=true'])
+          'buildtype=debug'])
 
 add_project_arguments('-std=gnu++20', language: 'cpp')
 

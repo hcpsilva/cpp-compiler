@@ -42,9 +42,9 @@ struct tree_node {
         (this->children.push_back(std::forward<nodes>(children)), ...);
     }
 
-    auto add_next(tree_node<T> const& child) -> void;
+    auto append_next(tree_node<T> const& child) -> void;
 
-    auto add_next(tree_node<T>&& child) -> void;
+    auto append_next(tree_node<T>&& child) -> void;
 
     auto print() const -> void;
 
@@ -54,17 +54,17 @@ struct tree_node {
 
     auto map(std::function<T(T const&)>) const -> tree_node<T>;
 
-    tree_node() = default;
+    consteval tree_node() noexcept = default;
 
-    tree_node(T const& in_value)
+    constexpr tree_node(T const& in_value)
         : value(in_value)
         , children()
     {
     }
 
-    tree_node(tree_node<T> const& in_node) noexcept = default;
+    constexpr tree_node(tree_node<T> const& in_node) noexcept = default;
 
-    tree_node(tree_node<T>&& in_node) noexcept = default;
+    constexpr tree_node(tree_node<T>&& in_node) noexcept = default;
 
     template <std::same_as<tree_node<T>>... nodes>
     tree_node(T const& value, nodes&&... children) noexcept
@@ -100,20 +100,20 @@ auto tree_node<T>::add_child(tree_node<T>&& child) -> void
 }
 
 template <typename T>
-auto tree_node<T>::add_next(tree_node<T> const& child) -> void
+auto tree_node<T>::append_next(tree_node<T> const& child) -> void
 {
     if (this->next != nullptr) {
-        next->add_next(child);
+        next->append_next(child);
     } else {
         next = std::make_shared<tree_node<T>>(child);
     }
 }
 
 template <typename T>
-auto tree_node<T>::add_next(tree_node<T>&& child) -> void
+auto tree_node<T>::append_next(tree_node<T>&& child) -> void
 {
     if (this->next != nullptr) {
-        next->add_next(std::move(child));
+        next->append_next(std::move(child));
     } else {
         next = std::make_shared<tree_node<T>>(std::move(child));
     }
@@ -122,7 +122,7 @@ auto tree_node<T>::add_next(tree_node<T>&& child) -> void
 template <typename T>
 auto tree_node<T>::print() const -> void
 {
-    fmt::print("\"{}\" [label=\"{}\"]\n", fmt::ptr(this), this->value);
+    fmt::print("{} [label=\"{}\"]\n", fmt::ptr(this), this->value);
 
     for (auto const& child : this->children)
         child.print();

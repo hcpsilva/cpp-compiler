@@ -31,7 +31,7 @@ all: compile
 setup:
 	rm -rf $(BUILD_DIR)
 	rm -f main.c
-	meson setup --buildtype=plain --debug=false $(BUILD_DIR)
+	meson setup --buildtype=release $(BUILD_DIR)
 
 compile: setup
 	meson compile -C $(BUILD_DIR)

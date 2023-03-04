@@ -47,7 +47,6 @@ enum class type {
 enum class operation {
     ATTRIBUTION,
     INITIALIZATION,
-    CALL,
     DIVISION,
     MULTIPLICATION,
     REST,
